@@ -1,0 +1,2 @@
+Q:/flutter-apps/linearity/android/app/.cxx/RelWithDebInfo/144r633c/x86_64/CMakeFiles/edit_cache.dir
+Q:/flutter-apps/linearity/android/app/.cxx/RelWithDebInfo/144r633c/x86_64/CMakeFiles/rebuild_cache.dir

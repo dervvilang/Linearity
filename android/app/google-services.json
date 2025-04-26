@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "856013144750",
+    "project_id": "linearity-d5051",
+    "storage_bucket": "linearity-d5051.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:856013144750:android:4d2dfd8a79a80dcb9f233f",
+        "android_client_info": {
+          "package_name": "com.example.linearity"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOQJn-IWQjesyLA0oIUvzI9duZ7RvpWJ0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

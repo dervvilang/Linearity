@@ -1,0 +1,17 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="40" height="40" rx="13" fill="white"/>
+<path d="M8 9L8 31" stroke="#020408" stroke-linecap="square"/>
+<path d="M32 9L32 31" stroke="#020408" stroke-linecap="square"/>
+<rect x="10.5" y="10" width="5" height="5" rx="1" fill="#020408"/>
+<rect x="17.5" y="10" width="5" height="5" rx="1" fill="#020408"/>
+<rect x="24.5" y="10" width="5" height="5" rx="1" fill="#020408"/>
+<rect x="10.5" y="17" width="5" height="5" rx="1" fill="#020408"/>
+<rect x="17.5" y="17" width="5" height="5" rx="1" fill="#020408"/>
+<rect x="24.5" y="17" width="5" height="5" rx="1" fill="#020408"/>
+<rect x="10.5" y="24" width="5" height="5" rx="1" fill="#020408"/>
+<rect x="17.5" y="24" width="5" height="5" rx="1" fill="#020408"/>
+<rect x="24.5" y="24" width="5" height="5" rx="1" fill="#020408"/>
+<path d="M31.5 33.9167C34.4791 33.9167 36.9166 31.4792 36.9166 28.5C36.9166 25.5209 34.4791 23.0834 31.5 23.0834C28.5208 23.0834 26.0833 25.5209 26.0833 28.5C26.0833 31.4792 28.5208 33.9167 31.5 33.9167Z" fill="white"/>
+<path d="M29.3333 28.5H33.6666" stroke="#020408" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M31.5 30.6667V26.3334" stroke="#020408" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

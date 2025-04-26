@@ -1,0 +1,170 @@
+{
+  "@@locale": "ru",
+  "welcomeTitle": "Добро пожаловать!",
+  "@welcomeTitle": {
+    "description": "Заголовок на экране приветствия"
+  },
+  "emailLabel": "Email или имя пользователя",
+  "@emailLabel": {
+    "description": "Подпись поля для ввода email или имени пользователя"
+  },
+  "passwordLabel": "Пароль",
+  "@passwordLabel": {
+    "description": "Подпись поля для ввода пароля"
+  },
+  "loginButton": "Войти",
+  "@loginButton": {
+    "description": "Кнопка для входа в систему"
+  },
+  "helloUser": "Добрый день,",
+  "@helloUser": {
+    "description": "Приветствие на главной странице"
+  },
+  "placeLabel": "место",
+  "@placeLabel": {
+    "description": "Используется для отображения позиции пользователя в рейтинге (например, '4 место')"
+  },
+  "home": "Главная",
+  "@home": {
+    "description": "Главная страница"
+  },
+  "rating": "Рейтинг",
+  "@rating": {
+    "description": "Страница с рейтингом"
+  },
+  "profile": "Профиль",
+  "@profile": {
+    "description": "Страница с профилем пользователя"
+  },
+  "commonRating": "Общий рейтинг",
+  "@commonRating": {
+    "description": "Подпись для общего рейтинга пользователя"
+  },
+  "pointsLabel": "{score, plural, =0{баллов} one{балл} few{балла} many{баллов} other{баллов}}",
+  "@pointsLabel": {
+    "description": "Используется для отображения количества баллов с правильным склонением",
+    "placeholders": {
+      "score": {
+        "type": "num"
+      }
+    }
+  },
+  "simpleTasks": "Простые задачи",
+  "@simpleTasks": {
+    "description": "Название категории простых задач"
+  },
+  "middleTasks": "Средние задачи",
+  "@middleTasks": {
+    "description": "Название категории средних задач"
+  },
+  "hardTasks": "Сложные задачи",
+  "@hardTasks": {
+    "description": "Название категории сложных задач"
+  },
+  "inverseMatrixTask": "Нахождение обратной матрицы",
+  "@inverseMatrixTask": {
+    "description": "Название категории задач, связанных с нахождением обратной матрицы"
+  },
+  "addMatrixTask": "Сложение, вычитание матриц",
+  "@addMatrixTask": {
+    "description": "Название категории задач, связанных с нахождением обратной матрицы"
+  },
+  "detMatrixTask": "Поиск определителя, собственных значений",
+  "@detMatrixTask": {
+    "description": "Название категории задач, связанных с нахождением обратной матрицы"
+  },
+  "levelsTitle": "Уровень {levelNumber}",
+  "@levelsTitle": {
+    "description": "Название уровня в списке (например, 'Уровень 1')",
+    "placeholders": {
+      "levelNumber": {
+        "example": "1",
+        "type": "String"
+      }
+    }
+  },
+  "ratingTitle": "Рейтинг игроков",
+  "@ratingTitle": {
+    "description": "Заголовок экрана рейтинга"
+  },
+  "task": "Задание",
+  "@task": {
+    "description": "Задача/задание"
+  },
+  "taskSubtitle": "Перемножить матрицу",
+  "@taskSubtitle": {
+    "description": "Описание задачи: перемножение матрицы"
+  },
+  "answer": "Ответ",
+  "@answer": {
+    "description": "Заголовок поля для ввода ответа"
+  },
+  "answerPlaceholder": "Введите свой вариант ответа",
+  "@answerPlaceholder": {
+    "description": "Подсказка в поле ввода ответа"
+  },
+  "hintButton": "Подсказка",
+  "@hintButton": {
+    "description": "Кнопка для получения подсказки к задаче"
+  },
+  "checkButton": "Проверить",
+  "@checkButton": {
+    "description": "Кнопка для проверки решения задачи"
+  },
+  "continueBtn": "Продолжить",
+  "@continueBtn": {
+    "description": "Кнопка для перехода к следующему этапу"
+  },
+  "winTitle": "Вы прошли!",
+  "@winTitle": {
+    "description": "Заголовок экрана при успешном завершении"
+  },
+  "winMessage": "Вы на правильном пути, продолжайте в том же духе!",
+  "@winMessage": {
+    "description": "Сообщение об успехе на экране победы"
+  },
+  "plusThreePoints": "+3 балла",
+  "@plusThreePoints": {
+    "description": "Отображение полученных баллов (например, '+3 балла')"
+  },
+  "exitButton": "Выйти",
+  "@exitButton": {
+    "description": "Кнопка для выхода (например, на экране победы)"
+  },
+  "profileAbout": "О себе",
+  "@profileAbout": {
+    "description": "Подпись к блоку с информацией о пользователе"
+  },
+  "settingsTitle": "Настройки",
+  "@settingsTitle": {
+    "description": "Заголовок экрана настроек"
+  },
+  "editProfile": "Редактировать профиль",
+  "@editProfile": {
+    "description": "Пункт меню в настройках"
+  },
+  "parameters": "Параметры",
+  "@parameters": {
+    "description": "Пункт меню для дополнительных параметров"
+  },
+  "lightDarkTheme": "Светлая/Тёмная тема",
+  "@lightDarkTheme": {
+    "description": "Пункт меню для переключения между светлой и тёмной темами"
+  },
+  "notifications": "Уведомления",
+  "@notifications": {
+    "description": "Пункт меню для настроек уведомлений"
+  },
+  "deleteAccount": "Удалить аккаунт",
+  "@deleteAccount": {
+    "description": "Опция удаления аккаунта в настройках"
+  },
+  "closeApp": "Закрыть приложение",
+  "@closeApp": {
+    "description": "Пункт меню для выхода из приложения"
+  },
+  "languageLabel": "Язык:",
+  "@languageLabel": {
+    "description": "Подпись переключателя языка"
+  }
+}

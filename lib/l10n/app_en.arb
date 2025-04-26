@@ -1,0 +1,170 @@
+{
+    "@@locale": "en",
+    "welcomeTitle": "Welcome!",
+    "@welcomeTitle": {
+        "description": "Title on the welcome screen (login)"
+    },
+    "emailLabel": "Email or username",
+    "@emailLabel": {
+        "description": "Label for the email or username input field"
+    },
+    "passwordLabel": "Password",
+    "@passwordLabel": {
+        "description": "Label for the password input field"
+    },
+    "loginButton": "Log in",
+    "@loginButton": {
+        "description": "Button text for logging into the system"
+    },
+    "helloUser": "Good day,",
+    "@helloUser": {
+        "description": "Greeting on the main screen"
+    },
+    "placeLabel": "place",
+    "@placeLabel": {
+        "description": "Used to display the user's position in the ranking (e.g., '4th place')"
+    },
+    "home": "Home",
+    "@home": {
+        "description": "Home page"
+    },
+    "rating": "Rating",
+    "@rating": {
+        "description": "Rating page"
+    },
+    "profile": "Profile",
+    "@profile": {
+        "description": "User profile page"
+    },
+    "commonRating": "Overall rating",
+    "@commonRating": {
+        "description": "Label for the user's overall rating"
+    },
+    "pointsLabel": "{score, plural, one{point} other{points}}",
+    "@pointsLabel": {
+        "description": "Used to display the number of points",
+        "placeholders": {
+            "score": {
+                "type": "num"
+            }
+        }
+    },
+    "simpleTasks": "Simple tasks",
+    "@simpleTasks": {
+        "description": "Name of the simple tasks category"
+    },
+    "middleTasks": "Intermediate tasks",
+    "@middleTasks": {
+        "description": "Name of the intermediate tasks category"
+    },
+    "hardTasks": "Complex tasks",
+    "@hardTasks": {
+        "description": "Name of the complex tasks category"
+    },
+    "inverseMatrixTask": "Matrix inversion",
+    "@inverseMatrixTask": {
+        "description": "Name of the task category related to matrix inversion"
+    },
+    "addMatrixTask": "Matrix addition and subtraction",
+    "@addMatrixTask": {
+        "description": "Name of the task category related to matrix addition and subtraction"
+    },
+    "detMatrixTask": "Determinant and eigenvalue computation",
+    "@detMatrixTask": {
+        "description": "Name of the task category related to computing determinants and eigenvalues"
+    },
+    "levelsTitle": "Level {levelNumber}",
+    "@levelsTitle": {
+        "description": "Title of a level in the list (e.g., 'Level 1')",
+        "placeholders": {
+            "levelNumber": {
+                "example": "1",
+                "type": "String"
+            }
+        }
+    },
+    "ratingTitle": "Player Ratings",
+    "@ratingTitle": {
+        "description": "Title of the rating screen"
+    },
+    "task": "Task",
+    "@task": {
+        "description": "Task or assignment"
+    },
+    "taskSubtitle": "Multiply the matrix",
+    "@taskSubtitle": {
+        "description": "Task description: multiplying a matrix"
+    },
+    "answer": "Answer",
+    "@answer": {
+        "description": "Label for the answer input field"
+    },
+    "answerPlaceholder": "Enter your answer",
+    "@answerPlaceholder": {
+        "description": "Hint text inside the answer input field"
+    },
+    "hintButton": "Hint",
+    "@hintButton": {
+        "description": "Button text to display a hint for the task"
+    },
+    "checkButton": "Check",
+    "@checkButton": {
+        "description": "Button text to check the solution"
+    },
+    "continueBtn": "Continue",
+    "@continueBtn": {
+        "description": "Button to proceed to the next step"
+    },
+    "winTitle": "You did it!",
+    "@winTitle": {
+        "description": "Title on the success screen"
+    },
+    "winMessage": "You're on the right track, keep it up!",
+    "@winMessage": {
+        "description": "Success message on the victory screen"
+    },
+    "plusThreePoints": "+3 points",
+    "@plusThreePoints": {
+        "description": "Display of points earned (e.g., '+3 points')"
+    },
+    "exitButton": "Exit",
+    "@exitButton": {
+        "description": "Button text for exiting (e.g., on the victory screen)"
+    },
+    "profileAbout": "About me",
+    "@profileAbout": {
+        "description": "Label for the 'About me' section in the user profile"
+    },
+    "settingsTitle": "Settings",
+    "@settingsTitle": {
+        "description": "Title of the settings screen"
+    },
+    "editProfile": "Edit Profile",
+    "@editProfile": {
+        "description": "Menu option for editing the profile"
+    },
+    "parameters": "Parameters",
+    "@parameters": {
+        "description": "Menu option for additional settings"
+    },
+    "lightDarkTheme": "Light/Dark Theme",
+    "@lightDarkTheme": {
+        "description": "Menu option for switching between light and dark themes"
+    },
+    "notifications": "Notifications",
+    "@notifications": {
+        "description": "Menu option for notification settings"
+    },
+    "deleteAccount": "Delete Account",
+    "@deleteAccount": {
+        "description": "Option for deleting the account in settings"
+    },
+    "closeApp": "Close App",
+    "@closeApp": {
+        "description": "Menu option for exiting the application"
+    },
+    "languageLabel": "Language:",
+    "@languageLabel": {
+        "description": "Label for the language switcher"
+    }
+}

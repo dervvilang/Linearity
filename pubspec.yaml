@@ -1,0 +1,70 @@
+name: linearity
+description: "An application with educational functions in the field of mathematics."
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.6.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  flutter_svg: ^2.0.17
+
+  # Firebase dependencies
+  firebase_core: ^3.12.1
+  firebase_auth: ^5.5.1
+
+  provider: ^6.1.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  generate: true
+
+  assets:
+    - lib/assets/icons/
+    - lib/assets/icons/avatar_1.svg
+    - lib/assets/icons/avatar_f2.svg
+    - lib/assets/icons/avatar_2.svg
+    - lib/assets/icons/arrow_left.svg
+    - lib/assets/icons/arrow_right_simple.svg
+    - lib/assets/icons/coin.svg
+    - lib/assets/icons/fire.svg
+    - lib/assets/icons/hint.svg
+    - lib/assets/icons/home.svg
+    - lib/assets/icons/matrix_simple.svg
+    - lib/assets/icons/matrix_medium.svg
+    - lib/assets/icons/matrix_hard.svg
+    - lib/assets/icons/medal.svg
+    - lib/assets/icons/line_medal.svg
+    - lib/assets/icons/profile.svg
+    - lib/assets/icons/setting.svg
+    - lib/assets/icons/tick-circle.svg
+  fonts:
+    - family: IBMPlexSans
+      fonts:
+        - asset: lib/assets/fonts/IBMPlexSans-Thin.ttf
+          weight: 100
+        - asset: lib/assets/fonts/IBMPlexSans-ExtraLight.ttf
+          weight: 200
+        - asset: lib/assets/fonts/IBMPlexSans-Light.ttf
+          weight: 300
+        - asset: lib/assets/fonts/IBMPlexSans-Regular.ttf
+          weight: 400
+        - asset: lib/assets/fonts/IBMPlexSans-Medium.ttf
+          weight: 500
+        - asset: lib/assets/fonts/IBMPlexSans-SemiBold.ttf
+          weight: 600
+        - asset: lib/assets/fonts/IBMPlexSans-Bold.ttf
+          weight: 700
+        - asset: lib/assets/fonts/IBMPlexSans-Italic.ttf
+          style: italic
