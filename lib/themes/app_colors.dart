@@ -6,10 +6,11 @@ class AppColors {
   static const Color scaffoldLight = Colors.white; // Фон приложения
   static const Color textForLight = Colors.black;    // Основной цвет текста
 
-  static const Color primaryBlue = Color(0xFF5DADE2); // Для приветствия, нижней панели и т.д.
+  static const Color primaryBlue = Color(0xFF3297DA); // Для приветствия, нижней панели и т.д.
   static const Color secondBlue = Color(0xFF85C1E9);  // Для вертикальных карточек (средний цвет)
   static const Color thirdBlue = Color(0xFFAED6F1);   // Для вертикальных карточек (низкий цвет)
-  static const Color fourthBlue = Color(0xFFEAF2F8);  // Для нижней навигационной панели
+  static const Color fourthBlue = Color(0xFFEAF2F8);
+  static const Color fifthBlue = Color(0xFF5DADE2);  // Для нижней навигационной панели
 
   // Дополнительные акценты в светлой теме
   static const Color primaryGreenLight = Color(0xFF4FD1C5);
@@ -29,7 +30,8 @@ class AppColors {
   static const Color primaryPurple = Color(0xFF2a2343); // Используется как базовый (фон нижней панели)
   static const Color secondPurple = Color(0xFF554785);  // Средний оттенок для вертикальных карточек
   static const Color thirdPurple = Color(0xFF7f6eba);   // Акцентный – для активных элементов (например, нижней панели)
-  static const Color fourthPurple = Color(0xFF8c7dc1); // Низкий оттенок для вертикальных карточек
+  static const Color fourthPurple = Color(0xFF8c7dc1);
+  static const Color fifthPurple = Color(0xFF403564); // Низкий оттенок для вертикальных карточек
 
   // Дополнительные акценты в тёмной теме
   static const Color successGreenDark = Color(0xFF43D9A0);

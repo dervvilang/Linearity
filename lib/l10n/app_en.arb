@@ -49,6 +49,10 @@
             }
         }
     },
+    "basicTasks": "Basic tasks",
+    "@basicTasks": {
+        "description": "Name of the basic tasks category"
+    },
     "simpleTasks": "Simple tasks",
     "@simpleTasks": {
         "description": "Name of the simple tasks category"
@@ -72,6 +76,10 @@
     "detMatrixTask": "Determinant and eigenvalue computation",
     "@detMatrixTask": {
         "description": "Name of the task category related to computing determinants and eigenvalues"
+    },
+    "multMatrixTask": "Matrix multiplication",
+    "@multMatrixTask": {
+        "description": "The name of the category of tasks related to matrix multiplication"
     },
     "levelsTitle": "Level {levelNumber}",
     "@levelsTitle": {

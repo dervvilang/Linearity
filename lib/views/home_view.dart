@@ -174,9 +174,30 @@ class _HomeViewState extends State<HomeView> {
                                 width: 34,
                                 height: 34,
                               ),
-                              title: loc.simpleTasks,
-                              subtitle: loc.inverseMatrixTask,
+                              title: loc.basicTasks,
+                              subtitle: loc.addMatrixTask,
                               color: additionalColors.primary,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const LevelsListView(
+                                      taskType: TaskType.simple,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 4),
+                            CategoryCard(
+                              icon: SvgPicture.asset(
+                                'lib/assets/icons/matrix_simple.svg',
+                                width: 34,
+                                height: 34,
+                              ),
+                              title: loc.simpleTasks,
+                              subtitle: loc.multMatrixTask,
+                              color: additionalColors.fifth,
                               onTap: () {
                                 Navigator.push(
                                   context,
@@ -196,7 +217,7 @@ class _HomeViewState extends State<HomeView> {
                                 height: 34,
                               ),
                               title: loc.middleTasks,
-                              subtitle: loc.addMatrixTask,
+                              subtitle: loc.detMatrixTask,
                               color: additionalColors.secondary,
                               onTap: () {
                                 Navigator.push(
@@ -217,7 +238,7 @@ class _HomeViewState extends State<HomeView> {
                                 height: 34,
                               ),
                               title: loc.hardTasks,
-                              subtitle: loc.detMatrixTask,
+                              subtitle: loc.inverseMatrixTask,
                               color: additionalColors.tertiary,
                               onTap: () {
                                 Navigator.push(

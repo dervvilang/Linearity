@@ -21,6 +21,7 @@ class AdditionalColors extends ThemeExtension<AdditionalColors> {
   final Color hint;
   final Color greetingText;
   final Color ratingCard;
+  final Color fifth;
 
   const AdditionalColors({
     required this.scaffold,
@@ -40,6 +41,7 @@ class AdditionalColors extends ThemeExtension<AdditionalColors> {
     required this.secondLevel,
     required this.secback,
     required this.hint,
+    required this.fifth,
   });
 
   @override
@@ -61,6 +63,7 @@ class AdditionalColors extends ThemeExtension<AdditionalColors> {
     Color? secondLevel,
     Color? secback,
     Color? hint,
+    Color? fifth,
   }) {
     return AdditionalColors(
       scaffold: scaffold ?? this.scaffold,
@@ -80,6 +83,7 @@ class AdditionalColors extends ThemeExtension<AdditionalColors> {
       secondLevel: secondLevel ?? this.secondLevel,
       secback: secback ?? this.secback,
       hint: hint ?? this.hint,
+      fifth: fifth ?? this.fifth,
     );
   }
 
@@ -104,6 +108,7 @@ class AdditionalColors extends ThemeExtension<AdditionalColors> {
       secondLevel: Color.lerp(secondLevel, other.secondLevel, t)!,
       secback: Color.lerp(secback, other.secback, t)!,
       hint: Color.lerp(hint, other.hint, t)!,
+      fifth: Color.lerp(fifth, other.fifth, t)!,
     );
   }
 }
