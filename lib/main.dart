@@ -1,8 +1,14 @@
+// lib/main.dart
+
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
 import 'package:linearity/themes/theme.dart';
 import 'package:linearity/views/home_view.dart';
+import 'package:linearity/services/firestore_service.dart';
+import 'package:linearity/view_models/level_selection_vm.dart';
+import 'package:linearity/view_models/task_vm.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
 import 'firebase_options.dart';
@@ -10,12 +16,12 @@ import 'firebase_options.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Инициализируем Firebase с опциями для текущей платформы
+  // Инициализируем Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Настраиваем системные оверлеи: нижняя навигационная панель прозрачная.
+  // Прозрачная нижняя панель
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       systemNavigationBarColor: Colors.transparent,
@@ -43,24 +49,42 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Linearity',
-      theme: lightTheme,
-      darkTheme: darkTheme,
-      themeMode: _isDarkTheme ? ThemeMode.dark : ThemeMode.light,
-      localizationsDelegates: const [
-        AppLocalizations.delegate,             
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
+    return MultiProvider(
+      providers: [
+        // Сервис доступа к Firestore
+        Provider<FirestoreService>(
+          create: (_) => FirestoreService(),
+        ),
+        // ViewModel экрана выбора уровня
+        ChangeNotifierProvider<LevelSelectionViewModel>(
+          create: (ctx) =>
+              LevelSelectionViewModel(ctx.read<FirestoreService>()),
+        ),
+        // ViewModel экрана задач
+        ChangeNotifierProvider<TaskViewModel>(
+          create: (ctx) => TaskViewModel(ctx.read<FirestoreService>()),
+        ),
+        // TODO: Добавить AuthViewModel, SettingsViewModel и т. д.
       ],
-      supportedLocales: const [
-        Locale('ru', ''), // Русский
-        Locale('en', ''), // Английский
-      ],
-      home: HomeView(
-        onThemeChanged: _toggleTheme,
-        isDarkTheme: _isDarkTheme,
+      child: MaterialApp(
+        title: 'Linearity',
+        theme: lightTheme,
+        darkTheme: darkTheme,
+        themeMode: _isDarkTheme ? ThemeMode.dark : ThemeMode.light,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,             
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('ru', ''), // Русский
+          Locale('en', ''), // Английский
+        ],
+        home: HomeView(
+          isDarkTheme: _isDarkTheme,
+          onThemeChanged: _toggleTheme,
+        ),
       ),
     );
   }

@@ -182,7 +182,7 @@ class _HomeViewState extends State<HomeView> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => const LevelsListView(
-                                      taskType: TaskType.simple,
+                                      taskType: TaskType.basic,
                                     ),
                                   ),
                                 );
