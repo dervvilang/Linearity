@@ -1,19 +1,23 @@
+// lib/widgets/matrix_input.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:linearity/themes/additional_colors.dart';
 
-/// Виджет для ввода матрицы в виде таблицы с обрамлением скобками.
 class MatrixInput extends StatefulWidget {
   final int rows;
   final int columns;
   final double cellSize;
+  /// Если не null — подсвечиваем ячейки: true → зелёный, false → красный
+  final List<List<bool>>? cellCorrectness;
 
   const MatrixInput({
-    Key? key,
+    super.key,
     required this.rows,
     required this.columns,
     this.cellSize = 50.0,
-  }) : super(key: key);
+    this.cellCorrectness,
+  });
 
   @override
   MatrixInputState createState() => MatrixInputState();
@@ -51,46 +55,19 @@ class MatrixInputState extends State<MatrixInput> {
     }).toList();
   }
 
+  /// Очищает все поля ввода
+  void clear() {
+    for (final row in _controllers) {
+      for (final c in row) {
+        c.text = '';
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.extension<AdditionalColors>()!;
-
-    final tableRows = List<TableRow>.generate(widget.rows, (i) {
-      return TableRow(
-        children: List<Widget>.generate(widget.columns, (j) {
-          return Padding(
-            padding: const EdgeInsets.all(4),
-            child: Container(
-              width: widget.cellSize,
-              height: widget.cellSize,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: colors.firstLevel,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: TextField(
-                controller: _controllers[i][j],
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 16),
-                keyboardType: const TextInputType.numberWithOptions(
-                  signed: true,
-                  decimal: true,
-                ),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[-\d.,]')),
-                ],
-                decoration: const InputDecoration(
-                  isDense: true,
-                  contentPadding: EdgeInsets.zero,
-                  border: InputBorder.none,
-                ),
-              ),
-            ),
-          );
-        }),
-      );
-    });
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -125,11 +102,52 @@ class MatrixInputState extends State<MatrixInput> {
                   ),
                 ),
                 Table(
-                  defaultColumnWidth:
-                      FixedColumnWidth(widget.cellSize + 8),
-                  defaultVerticalAlignment:
-                      TableCellVerticalAlignment.middle,
-                  children: tableRows,
+                  defaultColumnWidth: FixedColumnWidth(widget.cellSize + 8),
+                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                  children: List.generate(widget.rows, (i) {
+                    return TableRow(
+                      children: List.generate(widget.columns, (j) {
+                        // Выбираем цвет текста
+                        Color txtColor = colors.text;
+                        if (widget.cellCorrectness != null) {
+                          final ok = widget.cellCorrectness![i][j];
+                          txtColor = ok ? Colors.green : Colors.red;
+                        }
+                        return Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: Container(
+                            width: widget.cellSize,
+                            height: widget.cellSize,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: colors.firstLevel,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: TextField(
+                              controller: _controllers[i][j],
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 16, color: txtColor),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                signed: true,
+                                decimal: true,
+                              ),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                  RegExp(r'[-\d.,]'),
+                                ),
+                              ],
+                              decoration: const InputDecoration(
+                                isDense: true,
+                                contentPadding: EdgeInsets.zero,
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                    );
+                  }),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 4),

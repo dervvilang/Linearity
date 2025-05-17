@@ -39,6 +39,7 @@ class TaskViewModel extends ChangeNotifier {
         level: level,
         count: count,
       );
+      print("loaded ${tasks.length} tasks");
       currentIndex = 0;
     } catch (e) {
       hasError = true;

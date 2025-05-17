@@ -1,20 +1,34 @@
-// lib/views/levels_list_view.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
 import 'package:provider/provider.dart';
+
 import 'package:linearity/models/task_type.dart';
 import 'package:linearity/services/firestore_service.dart';
 import 'package:linearity/themes/additional_colors.dart';
 import 'package:linearity/widgets/level_card.dart';
 import 'package:linearity/views/task_view.dart';
 
-class LevelsListView extends StatelessWidget {
+class LevelsListView extends StatefulWidget {
   final TaskType taskType;
 
-  const LevelsListView({Key? key, required this.taskType}) : super(key: key);
+  const LevelsListView({super.key, required this.taskType});
+
+  @override
+  _LevelsListViewState createState() => _LevelsListViewState();
+}
+
+class _LevelsListViewState extends State<LevelsListView> {
+  late final Future<int> _levelsCountFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    // Кэшируем future, чтобы не дергать его при каждом rebuild
+    _levelsCountFuture = context
+        .read<FirestoreService>()
+        .fetchLevelsCount(widget.taskType.firestoreCategory);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,11 +36,8 @@ class LevelsListView extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.extension<AdditionalColors>()!;
 
-    // Тут мы сразу запускаем Future для количества уровней
     return FutureBuilder<int>(
-      future: context
-          .read<FirestoreService>()
-          .fetchLevelsCount(taskType.firestoreCategory),
+      future: _levelsCountFuture,
       builder: (context, snapshot) {
         // 1) Пока ждём — индикатор
         if (snapshot.connectionState != ConnectionState.done) {
@@ -37,11 +48,12 @@ class LevelsListView extends StatelessWidget {
         // 2) Если ошибка — сообщение
         if (snapshot.hasError) {
           return Scaffold(
-            body: Center(child: Text(loc.exitButton)),
+            body: Center(child: Text('Ошибка загрузки: ${snapshot.error}')),
           );
         }
         // 3) Успех — получили число уровней
         final levelsCount = snapshot.data ?? 0;
+
         return Scaffold(
           body: SafeArea(
             child: Column(
@@ -59,11 +71,11 @@ class LevelsListView extends StatelessWidget {
                         color: colors.greetingText,
                         child: IconButton(
                           icon: SvgPicture.asset(
-                            'assets/icons/arrow_left.svg',
+                            'lib/assets/icons/arrow_left.svg',
                             width: 26,
                             height: 26,
                             colorFilter: ColorFilter.mode(
-                              colors.text!,
+                              colors.text,
                               BlendMode.srcIn,
                             ),
                           ),
@@ -105,7 +117,7 @@ class LevelsListView extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                               builder: (_) => TaskView(
-                                taskType: taskType,
+                                taskType: widget.taskType,
                                 level: levelNum,
                               ),
                             ),
@@ -124,7 +136,7 @@ class LevelsListView extends StatelessWidget {
   }
 
   String _getTitle(AppLocalizations loc) {
-    switch (taskType) {
+    switch (widget.taskType) {
       case TaskType.basic:
         return loc.addMatrixTask;
       case TaskType.simple:

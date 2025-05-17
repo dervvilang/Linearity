@@ -2,7 +2,6 @@ enum OperationType {
   addition,
   subtraction,
   multiplication,
-  division,
   determinant,
   inverse,
 }

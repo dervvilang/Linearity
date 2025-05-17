@@ -1,3 +1,5 @@
+// lib/services/firestore_service.dart
+
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -27,7 +29,7 @@ class FirestoreService {
         .collection('level$level')
         .get();
     return snap.docs
-        .map((d) => MatrixTask.fromJson(d.id, d.data() as Map<String, dynamic>))
+        .map((d) => MatrixTask.fromJson(d.id, d.data()))
         .toList();
   }
 
