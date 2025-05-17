@@ -1,7 +1,13 @@
+// lib/views/setting_view.dart
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:linearity/themes/additional_colors.dart';
+import 'package:linearity/view_models/auth_vm.dart';
+import 'package:linearity/views/login_view.dart';
 import 'package:linearity/widgets/setting_card.dart';
 
 class SettingView extends StatefulWidget {
@@ -27,6 +33,23 @@ class _SettingViewState extends State<SettingView> {
     _isDarkTheme = widget.isDarkTheme;
   }
 
+  Future<void> _handleLogout() async {
+    // Выходим через AuthViewModel
+    final auth = context.read<AuthViewModel>();
+    await auth.logout();
+
+    // Переходим на экран логина и очищаем стек
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (_) => LoginView(
+          isDarkTheme: widget.isDarkTheme,
+          onThemeChanged: widget.onThemeChanged,
+        ),
+      ),
+      (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -37,14 +60,12 @@ class _SettingViewState extends State<SettingView> {
       body: SafeArea(
         child: Column(
           children: [
-            // Кастомный AppBar.
+            // — Кастомный AppBar —
             Container(
               height: 90,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               color: theme.appBarTheme.backgroundColor ?? theme.primaryColor,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Material(
                     shape: const CircleBorder(),
@@ -64,20 +85,23 @@ class _SettingViewState extends State<SettingView> {
                     child: Text(
                       loc.settingsTitle,
                       style: theme.textTheme.headlineMedium,
-                      softWrap: true,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
+
+            const SizedBox(height: 8),
+
+            // — Список настроек —
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.all(8),
                 children: [
                   SettingCard(
                     title: loc.editProfile,
-                    onTap: () {},
+                    onTap: () {/* TODO */},
                     backColor: additionalColors.ratingCard,
                     icon: SvgPicture.asset(
                       'lib/assets/icons/arrow_right_simple.svg',
@@ -88,7 +112,7 @@ class _SettingViewState extends State<SettingView> {
                   const SizedBox(height: 4),
                   SettingCard(
                     title: loc.parameters,
-                    onTap: () {},
+                    onTap: () {/* TODO */},
                     backColor: additionalColors.ratingCard,
                     icon: SvgPicture.asset(
                       'lib/assets/icons/arrow_right_simple.svg',
@@ -97,25 +121,22 @@ class _SettingViewState extends State<SettingView> {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  // Переключатель темы.
                   SettingCard(
                     title: loc.lightDarkTheme,
                     onTap: () {},
                     backColor: additionalColors.ratingCard,
                     trailing: Switch(
                       value: _isDarkTheme,
-                      onChanged: (value) {
-                        setState(() {
-                          _isDarkTheme = value;
-                        });
-                        widget.onThemeChanged(value);
+                      onChanged: (val) {
+                        setState(() => _isDarkTheme = val);
+                        widget.onThemeChanged(val);
                       },
                     ),
                   ),
                   const SizedBox(height: 4),
                   SettingCard(
                     title: loc.notifications,
-                    onTap: () {},
+                    onTap: () {/* TODO */},
                     backColor: additionalColors.ratingCard,
                     icon: SvgPicture.asset(
                       'lib/assets/icons/arrow_right_simple.svg',
@@ -126,14 +147,22 @@ class _SettingViewState extends State<SettingView> {
                   const SizedBox(height: 4),
                   SettingCard(
                     title: loc.deleteAccount,
-                    onTap: () {},
+                    onTap: () {/* TODO */},
                     backColor: additionalColors.alertRed,
                     textColor: additionalColors.errorRed,
                   ),
                   const SizedBox(height: 4),
+                  // Кнопка "Выйти"
+                  SettingCard(
+                    title: loc.exitButton,
+                    onTap: _handleLogout,
+                    backColor: additionalColors.ratingCard,
+                  ),
+                  const SizedBox(height: 4),
+                  // Кнопка "Закрыть приложение"
                   SettingCard(
                     title: loc.closeApp,
-                    onTap: () {},
+                    onTap: () => SystemNavigator.pop(),
                     backColor: additionalColors.ratingCard,
                   ),
                 ],

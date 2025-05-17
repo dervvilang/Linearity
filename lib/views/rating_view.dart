@@ -26,8 +26,8 @@ class _RatingViewState extends State<RatingView> {
   DateTime? _lastPressed;
 
   // Пример списка пользователей (8 элементов)
-  final List<linearity_user.User> sampleUsers = [
-    linearity_user.User(
+  final List<linearity_user.AppUser> sampleUsers = [
+    linearity_user.AppUser(
       id: '1',
       username: 'Alice',
       avatarUrl: 'lib/assets/icons/avatar_2.svg',
@@ -36,7 +36,7 @@ class _RatingViewState extends State<RatingView> {
       rank: 1,
       description: 'Лучший пользователь по математике.',
     ),
-    linearity_user.User(
+    linearity_user.AppUser(
       id: '2',
       username: 'Bob',
       avatarUrl: 'lib/assets/icons/avatar_2.svg',
@@ -45,7 +45,7 @@ class _RatingViewState extends State<RatingView> {
       rank: 2,
       description: 'Надежный и постоянный участник.',
     ),
-    linearity_user.User(
+    linearity_user.AppUser(
       id: '3',
       username: 'Charlie',
       avatarUrl: 'lib/assets/icons/avatar_2.svg',
@@ -54,7 +54,7 @@ class _RatingViewState extends State<RatingView> {
       rank: 3,
       description: 'Постепенно улучшает свои результаты.',
     ),
-    linearity_user.User(
+    linearity_user.AppUser(
       id: '4',
       username: 'Diana',
       avatarUrl: 'lib/assets/icons/avatar_2.svg',
@@ -63,7 +63,7 @@ class _RatingViewState extends State<RatingView> {
       rank: 4,
       description: 'Активный участник, много практикуется.',
     ),
-    linearity_user.User(
+    linearity_user.AppUser(
       id: '5',
       username: 'Eve',
       avatarUrl: 'lib/assets/icons/avatar_2.svg',
@@ -72,7 +72,7 @@ class _RatingViewState extends State<RatingView> {
       rank: 5,
       description: 'Активный участник, много практикуется.',
     ),
-    linearity_user.User(
+    linearity_user.AppUser(
       id: '6',
       username: 'Frank',
       avatarUrl: 'lib/assets/icons/avatar_2.svg',
@@ -81,7 +81,7 @@ class _RatingViewState extends State<RatingView> {
       rank: 6,
       description: 'Активный участник, много практикуется.',
     ),
-    linearity_user.User(
+    linearity_user.AppUser(
       id: '7',
       username: 'George',
       avatarUrl: 'lib/assets/icons/avatar_2.svg',
@@ -90,7 +90,7 @@ class _RatingViewState extends State<RatingView> {
       rank: 7,
       description: 'Постепенно улучшает свои результаты.',
     ),
-    linearity_user.User(
+    linearity_user.AppUser(
       id: '8',
       username: 'DianaExtended',
       avatarUrl: 'lib/assets/icons/avatar_2.svg',

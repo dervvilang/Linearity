@@ -1,45 +1,70 @@
-// ignore_for_file: file_names
+// lib/models/app_user.dart
 
-class User {
-    final String id;
-    String username;
-    String avatarUrl;
-    String email;
-    int score;
-    int rank;
-    String description;
+/// Модель пользователя для хранения в Firestore и в приложении.
+class AppUser {
+  /// Уникальный ID пользователя (например, из FirebaseAuth.uid)
+  final String id;
 
-    User({
-      required this.id,
-      required this.username,
-      this.avatarUrl = '',
-      required this.email,
-      this.score = 0,
-      this.rank = 0,
-      this.description = '',
-    });
+  /// Email, используется для входа
+  final String email;
 
-    Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'username': username,
-      'avatarUrl': avatarUrl,
-      'email': email,
-      'score': score,
-      'rank': rank,
-      'description': description,
-    };
+  /// Никнейм, задаётся при регистрации
+  final String username;
+
+  /// URL аватарки; по умолчанию — локальный SVG из assets
+  final String avatarUrl;
+
+  /// Описание профиля; может быть пустым
+  final String description;
+
+  /// Накопленные баллы за решения
+  final int score;
+
+  /// Позиция в рейтинге (0 означает «не рассчитано»)
+  final int rank;
+
+  /// Тема, предпочитаемая пользователем: "light" или "dark"
+  final String userTheme;
+
+  /// Конструктор
+  AppUser({
+    required this.id,
+    required this.email,
+    required this.username,
+    this.avatarUrl =
+        'file:///Q:/flutter-apps/linearity/lib/assets/icons/avatar_2.svg',
+    this.description = '',
+    this.score = 0,
+    this.rank = 0,
+    this.userTheme = 'light',
+  });
+
+  /// Преобразование из Map (например, документ Firestore)
+  factory AppUser.fromMap(Map<String, dynamic> map) {
+    return AppUser(
+      id: map['id'] as String,
+      email: map['email'] as String,
+      username: map['username'] as String,
+      avatarUrl: map['avatarUrl'] as String? ??
+          'file:///Q:/flutter-apps/linearity/lib/assets/icons/avatar_2.svg',
+      description: map['description'] as String? ?? '',
+      score: (map['score'] as num?)?.toInt() ?? 0,
+      rank: (map['rank'] as num?)?.toInt() ?? 0,
+      userTheme: map['userTheme'] as String? ?? 'light',
+    );
   }
 
-  factory User.fromMap(Map<String, dynamic> map) {
-    return User (
-      id: map['id'],
-      username: map['username'],
-      avatarUrl: map['avatarUrl'] ?? '',
-      email: map['email'],
-      score: map['score'] ?? 0,
-      rank: map['rank'] ?? 0,
-      description: map['description'] ?? '',
-    );
+  /// Преобразование в Map для записи в Firestore
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'email': email,
+      'username': username,
+      'avatarUrl': avatarUrl,
+      'description': description,
+      'score': score,
+      'rank': rank,
+      'userTheme': userTheme,
+    };
   }
 }
