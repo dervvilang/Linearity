@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:linearity/models/user.dart';
 import 'package:linearity/services/auth_service.dart';
@@ -10,14 +11,30 @@ class AuthViewModel extends ChangeNotifier {
   bool isLoading = true;
   String? error;
 
+  late final StreamSubscription<AppUser?> _userSub;
+
   AuthViewModel({AuthService? service})
       : _service = service ?? AuthService() {
-    // Подписка на смену состояния авторизации
-    _service.user.listen((appUser) {
-      user = appUser;
-      isLoading = false;
-      notifyListeners();
-    });
+    // Подписываемся на поток, ловим ошибки и отменяем в dispose
+    _userSub = _service.user.listen(
+      (appUser) {
+        user = appUser;
+        isLoading = false;
+        notifyListeners();
+      },
+      onError: (_) {
+        // Игнорируем ошибки доступа сразу после signOut
+        user = null;
+        isLoading = false;
+        notifyListeners();
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _userSub.cancel();
+    super.dispose();
   }
 
   /// Регистрация нового пользователя.
@@ -69,7 +86,7 @@ class AuthViewModel extends ChangeNotifier {
   /// Выход из аккаунта.
   Future<void> logout() async {
     await _service.signOut();
-    // После signOut стрим user выпустит null, и подписчик обновит state
+    // После signOut поток отдаст null и мы обновим состояние
   }
 
   /// Обновление полей профиля (username, avatarUrl, description).
@@ -93,7 +110,7 @@ class AuthViewModel extends ChangeNotifier {
         description: description,
       );
 
-      // Локально обновляем модель пользователя
+      // Локально обновляем модель
       user = user!.copyWith(
         username: username,
         avatarUrl: avatarUrl,

@@ -13,11 +13,17 @@ class AuthService {
   ///    чтобы при любом изменении профиля отдавать новое значение.
   Stream<AppUser?> get user {
     return _auth.authStateChanges().asyncExpand((fbUser) {
+      // если вышли — сразу кидаем null и завершаем прослушку документа
       if (fbUser == null) return Stream.value(null);
+
+      // иначе слушаем документ, но игнорируем ошибки доступа после signOut
       return _firestore
           .collection('users')
           .doc(fbUser.uid)
           .snapshots()
+          .handleError((_) {
+            // поглощаем ошибки (PERMISSION_DENIED и т.п.)
+          })
           .map((snap) => snap.exists ? AppUser.fromMap(snap.data()!) : null);
     });
   }
