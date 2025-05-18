@@ -1,5 +1,3 @@
-// lib/view_models/auth_vm.dart
-
 import 'package:flutter/foundation.dart';
 import 'package:linearity/models/user.dart';
 import 'package:linearity/services/auth_service.dart';
@@ -8,18 +6,13 @@ import 'package:linearity/services/auth_service.dart';
 class AuthViewModel extends ChangeNotifier {
   final AuthService _service;
 
-  /// Текущий авторизованный пользователь или null, если не в системе.
   AppUser? user;
-
-  /// Флаг загрузки (например, запрос к сети).
   bool isLoading = true;
-
-  /// Текст последней ошибки.
   String? error;
 
   AuthViewModel({AuthService? service})
       : _service = service ?? AuthService() {
-    // Слушаем изменения авторизационного состояния
+    // Подписка на смену состояния авторизации
     _service.user.listen((appUser) {
       user = appUser;
       isLoading = false;
@@ -76,18 +69,36 @@ class AuthViewModel extends ChangeNotifier {
   /// Выход из аккаунта.
   Future<void> logout() async {
     await _service.signOut();
-    // После signOut стрим user даст null, слушатель выше обновит user и isLoading
+    // После signOut стрим user выпустит null, и подписчик обновит state
   }
 
-  /// Обновление профиля (ник, аватар, описание, тема и т.д.).
-  Future<void> updateProfile(AppUser updated) async {
+  /// Обновление полей профиля (username, avatarUrl, description).
+  Future<void> updateProfile({
+    String? username,
+    String? avatarUrl,
+    String? description,
+  }) async {
+    if (user == null) return;
+
     try {
       isLoading = true;
       error = null;
       notifyListeners();
 
-      await _service.updateProfile(updated);
-      user = updated;
+      final uid = user!.id;
+      await _service.updateProfileFields(
+        uid: uid,
+        username: username,
+        avatarUrl: avatarUrl,
+        description: description,
+      );
+
+      // Локально обновляем модель пользователя
+      user = user!.copyWith(
+        username: username,
+        avatarUrl: avatarUrl,
+        description: description,
+      );
     } catch (e) {
       error = e.toString();
     } finally {

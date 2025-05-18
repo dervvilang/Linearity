@@ -2,14 +2,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter/services.dart';
 
 import 'firebase_options.dart';
 import 'themes/theme.dart';
 import 'services/firestore_service.dart';
+import 'view_models/theme_vm.dart';
 import 'view_models/auth_vm.dart';
 import 'view_models/level_selection_vm.dart';
 import 'view_models/task_vm.dart';
@@ -22,110 +23,72 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-  // Прозрачная нижняя панель
+  // Прозрачная навигационная панель
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(systemNavigationBarColor: Colors.transparent),
   );
 
-  runApp(const MyApp());
-}
-
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  /// Локальный флаг переключения темы (например, из HomeView)
-  bool _isDarkTheme = false;
-
-  void _toggleTheme(bool isDark) {
-    setState(() => _isDarkTheme = isDark);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MultiProvider(
+  runApp(
+    MultiProvider(
       providers: [
-        // Авторизация
+        ChangeNotifierProvider<ThemeViewModel>(
+          create: (_) => ThemeViewModel(),
+        ),
         ChangeNotifierProvider<AuthViewModel>(
           create: (_) => AuthViewModel(),
         ),
-        // Сервис Firestore
         Provider<FirestoreService>(
           create: (_) => FirestoreService(),
         ),
-        // VM для выбора уровня
         ChangeNotifierProvider<LevelSelectionViewModel>(
           create: (ctx) =>
               LevelSelectionViewModel(ctx.read<FirestoreService>()),
         ),
-        // VM для задач
         ChangeNotifierProvider<TaskViewModel>(
           create: (ctx) => TaskViewModel(ctx.read<FirestoreService>()),
         ),
-        // TODO: Добавить SettingsViewModel, RatingViewModel и др.
       ],
-      child: Consumer<AuthViewModel>(
-        builder: (context, auth, _) {
-          // Выбираем тему: либо глобальный isDarkTheme, либо настройка пользователя
-          final themeMode = auth.user?.userTheme == 'dark' || _isDarkTheme
-              ? ThemeMode.dark
-              : ThemeMode.light;
+      child: const MyApp(),
+    ),
+  );
+}
 
-          return MaterialApp(
-            title: 'Linearity',
-            theme: lightTheme,
-            darkTheme: darkTheme,
-            themeMode: themeMode,
-            debugShowCheckedModeBanner: false,
-            localizationsDelegates: const [
-              AppLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: const [
-              Locale('ru', ''),
-              Locale('en', ''),
-            ],
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
 
-            // Если идёт загрузка или нет пользователя — показываем правильный экран
-            home: auth.isLoading
-                ? const Scaffold(
-                    body: Center(child: CircularProgressIndicator()),
-                  )
-                : auth.user == null
-                    ? LoginView(
-                        isDarkTheme: _isDarkTheme,
-                        onThemeChanged: _toggleTheme,
-                      )
-                    : HomeView(
-                        isDarkTheme: _isDarkTheme,
-                        onThemeChanged: _toggleTheme,
-                      ),
+  @override
+  Widget build(BuildContext context) {
+    // Смотрим только локальный флаг темы
+    final themeVm = context.watch<ThemeViewModel>();
+    // Состояние аутентификации
+    final authVm = context.watch<AuthViewModel>();
 
-            // Роуты для явного перехода
-            routes: {
-              '/login': (_) => LoginView(
-                    isDarkTheme: _isDarkTheme,
-                    onThemeChanged: _toggleTheme,
-                  ),
-              '/register': (_) => RegisterView(
-                    isDarkTheme: _isDarkTheme,
-                    onThemeChanged: _toggleTheme,
-                  ),
-              '/home': (_) => HomeView(
-                    isDarkTheme: _isDarkTheme,
-                    onThemeChanged: _toggleTheme,
-                  ),
-              // TODO: добавить другие экраны '/profile', '/settings' и т. д.
-            },
-          );
-        },
-      ),
+    return MaterialApp(
+      title: 'Linearity',
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: themeVm.isDark ? ThemeMode.dark : ThemeMode.light,
+      debugShowCheckedModeBanner: false,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('ru'), Locale('en')],
+      // Стартовый экран: спиннер → логин → домашний
+      home: authVm.isLoading
+          ? const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            )
+          : authVm.user == null
+              ? const LoginView()
+              : const HomeView(),
+      routes: {
+        '/login': (_) => const LoginView(),
+        '/register': (_) => const RegisterView(),
+        '/home': (_) => const HomeView(),
+      },
     );
   }
 }

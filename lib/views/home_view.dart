@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Для SystemNavigator.pop()
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import 'package:linearity/models/task_type.dart';
 import 'package:linearity/themes/additional_colors.dart';
+import 'package:linearity/view_models/auth_vm.dart';
 import 'package:linearity/views/levels_list_view.dart';
 import 'package:linearity/views/profile_view.dart';
 import 'package:linearity/views/rating_view.dart';
@@ -11,14 +14,7 @@ import 'package:linearity/widgets/category_card.dart';
 import 'package:linearity/widgets/rating_card.dart';
 
 class HomeView extends StatefulWidget {
-  final ValueChanged<bool> onThemeChanged;
-  final bool isDarkTheme;
-
-  const HomeView({
-    super.key,
-    required this.onThemeChanged,
-    required this.isDarkTheme,
-  });
+  const HomeView({Key? key}) : super(key: key);
 
   @override
   State<HomeView> createState() => _HomeViewState();
@@ -32,7 +28,16 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final additionalColors = theme.extension<AdditionalColors>()!;
+    final colors = theme.extension<AdditionalColors>()!;
+
+    final authVm = context.watch<AuthViewModel>();
+    final user = authVm.user;
+
+    if (authVm.isLoading || user == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return WillPopScope(
       onWillPop: () async {
@@ -42,12 +47,9 @@ class _HomeViewState extends State<HomeView> {
           _lastPressed = now;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                'Нажмите ещё раз для выхода',
-                style: TextStyle(color: additionalColors.text),
-              ),
-              duration: const Duration(seconds: 2),
-              backgroundColor: additionalColors.secondary,
+              content: Text('Нажмите ещё раз для выхода',
+                  style: TextStyle(color: colors.text)),
+              backgroundColor: colors.secondary,
             ),
           );
           return false;
@@ -59,63 +61,59 @@ class _HomeViewState extends State<HomeView> {
         body: SafeArea(
           child: Column(
             children: [
-              // Кастомный AppBar высотой 100 пикселей.
+              // AppBar
               Container(
                 height: 100,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 color: theme.appBarTheme.backgroundColor ?? theme.primaryColor,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          loc.helloUser,
-                          style: theme.textTheme.headlineLarge?.copyWith(
-                            color: additionalColors.greetingText,
-                          ),
-                        ),
-                        Text(
-                          'UserName',
-                          style: theme.textTheme.headlineMedium,
-                        ),
+                        Text(loc.helloUser,
+                            style: theme.textTheme.headlineLarge
+                                ?.copyWith(color: colors.greetingText)),
+                        Text(user.username,
+                            style: theme.textTheme.headlineMedium),
                       ],
                     ),
                     GestureDetector(
                       onTap: () {
-                        // Передаём актуальное состояние темы в ProfileView.
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ProfileView(
-                              isDarkTheme: widget.isDarkTheme,
-                              onThemeChanged: widget.onThemeChanged,
-                            ),
-                          ),
+                              builder: (_) => const ProfileView()),
                         );
                       },
-                      child: SvgPicture.asset(
-                        'lib/assets/icons/avatar_2.svg',
-                        width: 48,
-                        height: 48,
-                      ),
+                      child: user.avatarUrl.startsWith('http')
+                          ? CircleAvatar(
+                              radius: 24,
+                              backgroundImage: NetworkImage(user.avatarUrl),
+                            )
+                          : SvgPicture.asset(
+                              user.avatarUrl,
+                              width: 48,
+                              height: 48,
+                              color: colors.text,
+                            ),
                     ),
                   ],
                 ),
               ),
+
+              // Content
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: SingleChildScrollView(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // Виджеты с рейтингом и баллами.
+                        const SizedBox(height: 14),
+                        // Rank & Score
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Expanded(
                               child: RatingCard(
@@ -124,17 +122,13 @@ class _HomeViewState extends State<HomeView> {
                                   width: 28,
                                   height: 28,
                                 ),
-                                title: "4 ${loc.placeLabel}",
+                                title: '${user.rank} ${loc.placeLabel}',
                                 subtitle: loc.commonRating,
                                 onTap: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => RatingView(
-                                        isDarkTheme: widget.isDarkTheme,
-                                        onThemeChanged: widget.onThemeChanged,
-                                      ),
-                                    ),
+                                        builder: (_) => const RatingView()),
                                   );
                                 },
                               ),
@@ -147,17 +141,13 @@ class _HomeViewState extends State<HomeView> {
                                   width: 26,
                                   height: 26,
                                 ),
-                                title: "680",
-                                subtitle: loc.pointsLabel(680),
+                                title: '${user.score}',
+                                subtitle: loc.pointsLabel(user.score),
                                 onTap: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => RatingView(
-                                        isDarkTheme: widget.isDarkTheme,
-                                        onThemeChanged: widget.onThemeChanged,
-                                      ),
-                                    ),
+                                        builder: (_) => const RatingView()),
                                   );
                                 },
                               ),
@@ -165,94 +155,75 @@ class _HomeViewState extends State<HomeView> {
                           ],
                         ),
                         const SizedBox(height: 14),
-                        // Виджеты с типами заданий.
-                        Column(
-                          children: [
-                            CategoryCard(
-                              icon: SvgPicture.asset(
-                                'lib/assets/icons/matrix_simple.svg',
-                                width: 34,
-                                height: 34,
-                              ),
-                              title: loc.basicTasks,
-                              subtitle: loc.addMatrixTask,
-                              color: additionalColors.primary,
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const LevelsListView(
-                                      taskType: TaskType.basic,
-                                    ),
-                                  ),
-                                );
-                              },
+                        // Task categories
+                        CategoryCard(
+                          icon: SvgPicture.asset(
+                              'lib/assets/icons/matrix_simple.svg',
+                              width: 34,
+                              height: 34),
+                          title: loc.basicTasks,
+                          subtitle: loc.addMatrixTask,
+                          color: colors.primary,
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const LevelsListView(
+                                  taskType: TaskType.basic),
                             ),
-                            const SizedBox(height: 4),
-                            CategoryCard(
-                              icon: SvgPicture.asset(
-                                'lib/assets/icons/matrix_simple.svg',
-                                width: 34,
-                                height: 34,
-                              ),
-                              title: loc.simpleTasks,
-                              subtitle: loc.multMatrixTask,
-                              color: additionalColors.fifth,
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const LevelsListView(
-                                      taskType: TaskType.simple,
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                            const SizedBox(height: 4),
-                            CategoryCard(
-                              icon: SvgPicture.asset(
-                                'lib/assets/icons/matrix_medium.svg',
-                                width: 34,
-                                height: 34,
-                              ),
-                              title: loc.middleTasks,
-                              subtitle: loc.detMatrixTask,
-                              color: additionalColors.secondary,
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const LevelsListView(
-                                      taskType: TaskType.medium,
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                            const SizedBox(height: 4),
-                            CategoryCard(
-                              icon: SvgPicture.asset(
-                                'lib/assets/icons/matrix_hard.svg',
-                                width: 34,
-                                height: 34,
-                              ),
-                              title: loc.hardTasks,
-                              subtitle: loc.inverseMatrixTask,
-                              color: additionalColors.tertiary,
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const LevelsListView(
-                                      taskType: TaskType.hard,
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
+                          ),
                         ),
+                        const SizedBox(height: 4),
+                        CategoryCard(
+                          icon: SvgPicture.asset(
+                              'lib/assets/icons/matrix_simple.svg',
+                              width: 34,
+                              height: 34),
+                          title: loc.simpleTasks,
+                          subtitle: loc.multMatrixTask,
+                          color: colors.fifth,
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const LevelsListView(
+                                  taskType: TaskType.simple),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        CategoryCard(
+                          icon: SvgPicture.asset(
+                              'lib/assets/icons/matrix_medium.svg',
+                              width: 34,
+                              height: 34),
+                          title: loc.middleTasks,
+                          subtitle: loc.detMatrixTask,
+                          color: colors.secondary,
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const LevelsListView(
+                                  taskType: TaskType.medium),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        CategoryCard(
+                          icon: SvgPicture.asset(
+                              'lib/assets/icons/matrix_hard.svg',
+                              width: 34,
+                              height: 34),
+                          title: loc.hardTasks,
+                          subtitle: loc.inverseMatrixTask,
+                          color: colors.tertiary,
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const LevelsListView(
+                                  taskType: TaskType.hard),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
                       ],
                     ),
                   ),
@@ -261,17 +232,19 @@ class _HomeViewState extends State<HomeView> {
             ],
           ),
         ),
+
         bottomNavigationBar: SafeArea(
-          top: false,
           child: BottomNavigationBar(
             currentIndex: _currentIndex,
+            selectedItemColor: colors.greetingText,
+            unselectedItemColor: colors.inactiveButtons,
             items: [
               BottomNavigationBarItem(
                 icon: SvgPicture.asset(
                   'lib/assets/icons/home.svg',
                   width: 24,
                   height: 24,
-                  color: additionalColors.greetingText,
+                  color: colors.greetingText,
                 ),
                 label: loc.home,
               ),
@@ -280,7 +253,7 @@ class _HomeViewState extends State<HomeView> {
                   'lib/assets/icons/line_medal.svg',
                   width: 24,
                   height: 24,
-                  color: additionalColors.inactiveButtons,
+                  color: colors.inactiveButtons,
                 ),
                 label: loc.rating,
               ),
@@ -289,35 +262,19 @@ class _HomeViewState extends State<HomeView> {
                   'lib/assets/icons/profile.svg',
                   width: 24,
                   height: 24,
-                  color: additionalColors.inactiveButtons,
+                  color: colors.inactiveButtons,
                 ),
                 label: loc.profile,
               ),
             ],
             onTap: (index) {
-              setState(() {
-                _currentIndex = index;
-              });
+              setState(() => _currentIndex = index);
               if (index == 1) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => RatingView(
-                      isDarkTheme: widget.isDarkTheme,
-                      onThemeChanged: widget.onThemeChanged,
-                    ),
-                  ),
-                );
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const RatingView()));
               } else if (index == 2) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ProfileView(
-                      isDarkTheme: widget.isDarkTheme,
-                      onThemeChanged: widget.onThemeChanged,
-                    ),
-                  ),
-                );
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const ProfileView()));
               }
             },
           ),

@@ -1,8 +1,13 @@
+// lib/views/profile_view.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
+
 import 'package:linearity/themes/additional_colors.dart';
+import 'package:linearity/view_models/auth_vm.dart';
 import 'package:linearity/views/setting_view.dart';
 import 'package:linearity/views/rating_view.dart';
 import 'package:linearity/views/home_view.dart';
@@ -10,24 +15,34 @@ import 'package:linearity/widgets/editable_about_me_card.dart';
 import 'package:linearity/widgets/rating_card.dart';
 
 class ProfileView extends StatelessWidget {
-  // Удаляем isDarkTheme из конструктора, т.к. его будем получать динамически
-  final ValueChanged<bool> onThemeChanged;
-
-  const ProfileView({
-    super.key,
-    required this.onThemeChanged, required bool isDarkTheme,
-  });
+  const ProfileView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    DateTime? lastPressed;
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final additionalColors = theme.extension<AdditionalColors>()!;
+    final colors = theme.extension<AdditionalColors>()!;
+    final authVm = context.watch<AuthViewModel>();
+    final user = authVm.user;
 
-    // Получаем актуальное состояние темы из контекста:
-    final bool currentIsDarkTheme = theme.brightness == Brightness.dark;
+    // 1) Если мы еще грузим состояние аутентификации — показываем спиннер
+    if (authVm.isLoading && user == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
+    // 2) Если не залогинен — редиректим на логин
+    if (user == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil('/login', (_) => false);
+      });
+      return const Scaffold(body: SizedBox.shrink());
+    }
+
+    // 3) Здесь уже точно есть user и мы не в процессе его загрузки
+    DateTime? lastPressed;
     return WillPopScope(
       onWillPop: () async {
         final now = DateTime.now();
@@ -38,10 +53,9 @@ class ProfileView extends StatelessWidget {
             SnackBar(
               content: Text(
                 'Нажмите ещё раз для выхода',
-                style: TextStyle(color: additionalColors.text),
+                style: TextStyle(color: colors.text),
               ),
-              duration: const Duration(seconds: 2),
-              backgroundColor: additionalColors.secondary,
+              backgroundColor: colors.secondary,
             ),
           );
           return false;
@@ -54,27 +68,21 @@ class ProfileView extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                // Кнопка перехода в настройки, выровненная по правому краю.
+                // Кнопка «Настройки»
                 Align(
                   alignment: Alignment.topRight,
                   child: Material(
-                    color: additionalColors.inactiveButtons,
+                    color: colors.inactiveButtons,
                     shape: const CircleBorder(),
                     clipBehavior: Clip.hardEdge,
                     child: InkWell(
                       borderRadius: BorderRadius.circular(30),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SettingView(
-                              // Передаём актуальное состояние темы из контекста
-                              isDarkTheme: currentIsDarkTheme,
-                              onThemeChanged: onThemeChanged,
-                            ),
-                          ),
-                        );
-                      },
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const SettingView(),
+                        ),
+                      ),
                       child: Container(
                         width: 50,
                         height: 50,
@@ -83,37 +91,46 @@ class ProfileView extends StatelessWidget {
                           'lib/assets/icons/setting.svg',
                           width: 30,
                           height: 30,
-                          color: additionalColors.text,
+                          color: colors.text,
                         ),
                       ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
+
+                // Аватар
                 CircleAvatar(
                   radius: 75,
                   backgroundColor: Colors.transparent,
                   child: ClipOval(
-                    child: SvgPicture.asset(
-                      'lib/assets/icons/avatar_2.svg',
-                      width: 135,
-                      height: 135,
-                      fit: BoxFit.cover,
-                    ),
+                    child: user.avatarUrl.startsWith('http')
+                        ? Image.network(
+                            user.avatarUrl,
+                            width: 150,
+                            height: 150,
+                            fit: BoxFit.cover,
+                          )
+                        : SvgPicture.asset(
+                            user.avatarUrl,
+                            width: 135,
+                            height: 135,
+                            fit: BoxFit.cover,
+                          ),
                   ),
                 ),
                 const SizedBox(height: 16),
-                Text(
-                  'UserName',
-                  style: theme.textTheme.headlineMedium,
-                ),
+
+                // Никнейм
+                Text(user.username, style: theme.textTheme.headlineMedium),
                 const SizedBox(height: 10),
+
+                // Ранг, очки и «О себе»
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: Column(
                     children: [
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Expanded(
                             child: RatingCard(
@@ -122,19 +139,14 @@ class ProfileView extends StatelessWidget {
                                 width: 28,
                                 height: 28,
                               ),
-                              title: "4 ${loc.placeLabel}",
+                              title: '${user.rank} ${loc.placeLabel}',
                               subtitle: loc.commonRating,
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => RatingView(
-                                      isDarkTheme: currentIsDarkTheme,
-                                      onThemeChanged: onThemeChanged,
-                                    ),
-                                  ),
-                                );
-                              },
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const RatingView(),
+                                ),
+                              ),
                             ),
                           ),
                           const SizedBox(width: 4),
@@ -145,19 +157,14 @@ class ProfileView extends StatelessWidget {
                                 width: 26,
                                 height: 26,
                               ),
-                              title: "680",
-                              subtitle: loc.pointsLabel(680),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => RatingView(
-                                      isDarkTheme: currentIsDarkTheme,
-                                      onThemeChanged: onThemeChanged,
-                                    ),
-                                  ),
-                                );
-                              },
+                              title: '${user.score}',
+                              subtitle: loc.pointsLabel(user.score),
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const RatingView(),
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -172,18 +179,17 @@ class ProfileView extends StatelessWidget {
           ),
         ),
         bottomNavigationBar: SafeArea(
-          top: false,
           child: BottomNavigationBar(
             currentIndex: 2,
-            selectedItemColor: additionalColors.greetingText,
-            unselectedItemColor: additionalColors.inactiveButtons,
+            selectedItemColor: colors.greetingText,
+            unselectedItemColor: colors.inactiveButtons,
             items: [
               BottomNavigationBarItem(
                 icon: SvgPicture.asset(
                   'lib/assets/icons/home.svg',
                   width: 24,
                   height: 24,
-                  color: additionalColors.inactiveButtons,
+                  color: colors.inactiveButtons,
                 ),
                 label: loc.home,
               ),
@@ -192,7 +198,7 @@ class ProfileView extends StatelessWidget {
                   'lib/assets/icons/line_medal.svg',
                   width: 24,
                   height: 24,
-                  color: additionalColors.inactiveButtons,
+                  color: colors.inactiveButtons,
                 ),
                 label: loc.rating,
               ),
@@ -201,31 +207,21 @@ class ProfileView extends StatelessWidget {
                   'lib/assets/icons/profile.svg',
                   width: 24,
                   height: 24,
-                  color: additionalColors.greetingText,
+                  color: colors.greetingText,
                 ),
                 label: loc.profile,
               ),
             ],
             onTap: (index) {
               if (index == 0) {
-                Navigator.push(
+                Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => HomeView(
-                      isDarkTheme: currentIsDarkTheme,
-                      onThemeChanged: onThemeChanged,
-                    ),
-                  ),
+                  MaterialPageRoute(builder: (_) => const HomeView()),
                 );
               } else if (index == 1) {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => RatingView(
-                      isDarkTheme: currentIsDarkTheme,
-                      onThemeChanged: onThemeChanged,
-                    ),
-                  ),
+                  MaterialPageRoute(builder: (_) => const RatingView()),
                 );
               }
             },

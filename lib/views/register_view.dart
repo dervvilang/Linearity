@@ -1,5 +1,3 @@
-// lib/views/register_view.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -9,14 +7,7 @@ import 'package:linearity/views/login_view.dart';
 import 'package:linearity/views/home_view.dart';
 
 class RegisterView extends StatefulWidget {
-  final bool isDarkTheme;
-  final ValueChanged<bool> onThemeChanged;
-
-  const RegisterView({
-    Key? key,
-    required this.isDarkTheme,
-    required this.onThemeChanged,
-  }) : super(key: key);
+  const RegisterView({Key? key}) : super(key: key);
 
   @override
   State<RegisterView> createState() => _RegisterViewState();
@@ -45,15 +36,11 @@ class _RegisterViewState extends State<RegisterView> {
       email: _emailCtrl.text.trim(),
       password: _passwordCtrl.text,
     );
+    if (!mounted) return;
     if (auth.error == null && auth.user != null) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => HomeView(
-            isDarkTheme: widget.isDarkTheme,
-            onThemeChanged: widget.onThemeChanged,
-          ),
-        ),
+        MaterialPageRoute(builder: (_) => const HomeView()),
       );
     }
   }
@@ -73,10 +60,7 @@ class _RegisterViewState extends State<RegisterView> {
             key: _formKey,
             child: Column(
               children: [
-                SvgPicture.asset(
-                  'lib/assets/icons/profile.svg',
-                  height: 120,
-                ),
+                SvgPicture.asset('lib/assets/icons/profile.svg', height: 120),
                 const SizedBox(height: 32),
                 TextFormField(
                   controller: _usernameCtrl,
@@ -138,11 +122,7 @@ class _RegisterViewState extends State<RegisterView> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => LoginView(
-                                isDarkTheme: widget.isDarkTheme,
-                                onThemeChanged: widget.onThemeChanged,
-                              ),
-                            ),
+                                builder: (_) => const LoginView()),
                           );
                         },
                   child: const Text('Уже есть аккаунт? Войти'),

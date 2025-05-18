@@ -1,5 +1,3 @@
-// lib/views/setting_view.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
@@ -7,60 +5,26 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:linearity/themes/additional_colors.dart';
 import 'package:linearity/view_models/auth_vm.dart';
+import 'package:linearity/view_models/theme_vm.dart';
 import 'package:linearity/views/login_view.dart';
 import 'package:linearity/widgets/setting_card.dart';
 
-class SettingView extends StatefulWidget {
-  final bool isDarkTheme;
-  final ValueChanged<bool> onThemeChanged;
-
-  const SettingView({
-    super.key,
-    required this.isDarkTheme,
-    required this.onThemeChanged,
-  });
-
-  @override
-  State<SettingView> createState() => _SettingViewState();
-}
-
-class _SettingViewState extends State<SettingView> {
-  late bool _isDarkTheme;
-
-  @override
-  void initState() {
-    super.initState();
-    _isDarkTheme = widget.isDarkTheme;
-  }
-
-  Future<void> _handleLogout() async {
-    // Выходим через AuthViewModel
-    final auth = context.read<AuthViewModel>();
-    await auth.logout();
-
-    // Переходим на экран логина и очищаем стек
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (_) => LoginView(
-          isDarkTheme: widget.isDarkTheme,
-          onThemeChanged: widget.onThemeChanged,
-        ),
-      ),
-      (route) => false,
-    );
-  }
+class SettingView extends StatelessWidget {
+  const SettingView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final additionalColors = theme.extension<AdditionalColors>()!;
+    final colors = theme.extension<AdditionalColors>()!;
+    final themeVm = context.watch<ThemeViewModel>();
+    final isDark = themeVm.isDark;
 
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
-            // — Кастомный AppBar —
+            // AppBar
             Container(
               height: 90,
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -69,13 +33,13 @@ class _SettingViewState extends State<SettingView> {
                 children: [
                   Material(
                     shape: const CircleBorder(),
-                    color: additionalColors.greetingText,
+                    color: colors.greetingText,
                     child: IconButton(
                       icon: SvgPicture.asset(
                         'lib/assets/icons/arrow_left.svg',
                         width: 26,
                         height: 26,
-                        color: additionalColors.text,
+                        color: colors.text,
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
@@ -93,8 +57,6 @@ class _SettingViewState extends State<SettingView> {
             ),
 
             const SizedBox(height: 8),
-
-            // — Список настроек —
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.all(8),
@@ -102,7 +64,7 @@ class _SettingViewState extends State<SettingView> {
                   SettingCard(
                     title: loc.editProfile,
                     onTap: () {/* TODO */},
-                    backColor: additionalColors.ratingCard,
+                    backColor: colors.ratingCard,
                     icon: SvgPicture.asset(
                       'lib/assets/icons/arrow_right_simple.svg',
                       width: 26,
@@ -113,7 +75,7 @@ class _SettingViewState extends State<SettingView> {
                   SettingCard(
                     title: loc.parameters,
                     onTap: () {/* TODO */},
-                    backColor: additionalColors.ratingCard,
+                    backColor: colors.ratingCard,
                     icon: SvgPicture.asset(
                       'lib/assets/icons/arrow_right_simple.svg',
                       width: 26,
@@ -124,20 +86,17 @@ class _SettingViewState extends State<SettingView> {
                   SettingCard(
                     title: loc.lightDarkTheme,
                     onTap: () {},
-                    backColor: additionalColors.ratingCard,
+                    backColor: colors.ratingCard,
                     trailing: Switch(
-                      value: _isDarkTheme,
-                      onChanged: (val) {
-                        setState(() => _isDarkTheme = val);
-                        widget.onThemeChanged(val);
-                      },
+                      value: isDark,
+                      onChanged: themeVm.toggleTheme,
                     ),
                   ),
                   const SizedBox(height: 4),
                   SettingCard(
                     title: loc.notifications,
                     onTap: () {/* TODO */},
-                    backColor: additionalColors.ratingCard,
+                    backColor: colors.ratingCard,
                     icon: SvgPicture.asset(
                       'lib/assets/icons/arrow_right_simple.svg',
                       width: 26,
@@ -148,22 +107,26 @@ class _SettingViewState extends State<SettingView> {
                   SettingCard(
                     title: loc.deleteAccount,
                     onTap: () {/* TODO */},
-                    backColor: additionalColors.alertRed,
-                    textColor: additionalColors.errorRed,
+                    backColor: colors.alertRed,
+                    textColor: colors.errorRed,
                   ),
                   const SizedBox(height: 4),
-                  // Кнопка "Выйти"
                   SettingCard(
                     title: loc.exitButton,
-                    onTap: _handleLogout,
-                    backColor: additionalColors.ratingCard,
+                    onTap: () async {
+                      await context.read<AuthViewModel>().logout();
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (_) => const LoginView()),
+                        (_) => false,
+                      );
+                    },
+                    backColor: colors.ratingCard,
                   ),
                   const SizedBox(height: 4),
-                  // Кнопка "Закрыть приложение"
                   SettingCard(
                     title: loc.closeApp,
                     onTap: () => SystemNavigator.pop(),
-                    backColor: additionalColors.ratingCard,
+                    backColor: colors.ratingCard,
                   ),
                 ],
               ),

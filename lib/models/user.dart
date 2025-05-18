@@ -1,5 +1,3 @@
-// lib/models/app_user.dart
-
 /// Модель пользователя для хранения в Firestore и в приложении.
 class AppUser {
   /// Уникальный ID пользователя (например, из FirebaseAuth.uid)
@@ -32,7 +30,7 @@ class AppUser {
     required this.email,
     required this.username,
     this.avatarUrl =
-        'file:///Q:/flutter-apps/linearity/lib/assets/icons/avatar_2.svg',
+        'lib/assets/icons/avatar_2.svg',
     this.description = '',
     this.score = 0,
     this.rank = 0,
@@ -46,7 +44,7 @@ class AppUser {
       email: map['email'] as String,
       username: map['username'] as String,
       avatarUrl: map['avatarUrl'] as String? ??
-          'file:///Q:/flutter-apps/linearity/lib/assets/icons/avatar_2.svg',
+          'lib/assets/icons/avatar_2.svg',
       description: map['description'] as String? ?? '',
       score: (map['score'] as num?)?.toInt() ?? 0,
       rank: (map['rank'] as num?)?.toInt() ?? 0,
@@ -66,5 +64,26 @@ class AppUser {
       'rank': rank,
       'userTheme': userTheme,
     };
+  }
+
+  /// Удобный copyWith для обновления части полей
+  AppUser copyWith({
+    String? username,
+    String? avatarUrl,
+    String? description,
+    int? score,
+    int? rank,
+    String? userTheme,
+  }) {
+    return AppUser(
+      id: id,
+      email: email,
+      username: username ?? this.username,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      description: description ?? this.description,
+      score: score ?? this.score,
+      rank: rank ?? this.rank,
+      userTheme: userTheme ?? this.userTheme,
+    );
   }
 }

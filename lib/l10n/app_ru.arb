@@ -143,6 +143,22 @@
   "@profileAbout": {
     "description": "Подпись к блоку с информацией о пользователе"
   },
+  "cancelButton": "Отмена",
+  "@cancelButton": {
+    "description": "Кнопка для Отмена"
+  },
+  "saveButton": "Сохранить",
+  "@saveButton": {
+    "description": "Кнопка для Сохранить"
+  },
+  "profileSaved": "Описание обновлено",
+  "@profileSaved": {
+    "description": "Описание обновлено"
+  },
+  "editButton": "Редактировать",
+  "@editButton": {
+    "description": "Кнопка для Редактировать"
+  },
   "settingsTitle": "Настройки",
   "@settingsTitle": {
     "description": "Заголовок экрана настроек"

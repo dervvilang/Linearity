@@ -1,5 +1,3 @@
-// lib/views/login_view.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -9,14 +7,7 @@ import 'package:linearity/views/register_view.dart';
 import 'package:linearity/views/home_view.dart';
 
 class LoginView extends StatefulWidget {
-  final bool isDarkTheme;
-  final ValueChanged<bool> onThemeChanged;
-
-  const LoginView({
-    Key? key,
-    required this.isDarkTheme,
-    required this.onThemeChanged,
-  }) : super(key: key);
+  const LoginView({Key? key}) : super(key: key);
 
   @override
   State<LoginView> createState() => _LoginViewState();
@@ -42,15 +33,10 @@ class _LoginViewState extends State<LoginView> {
       email: _emailCtrl.text.trim(),
       password: _passwordCtrl.text,
     );
+    if (!mounted) return;
     if (auth.error == null && auth.user != null) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => HomeView(
-            isDarkTheme: widget.isDarkTheme,
-            onThemeChanged: widget.onThemeChanged,
-          ),
-        ),
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const HomeView()),
       );
     }
   }
@@ -73,6 +59,7 @@ class _LoginViewState extends State<LoginView> {
                 SvgPicture.asset(
                   'lib/assets/icons/profile.svg',
                   height: 120,
+                  color: colors.text,
                 ),
                 const SizedBox(height: 32),
                 TextFormField(
@@ -127,11 +114,7 @@ class _LoginViewState extends State<LoginView> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => RegisterView(
-                                isDarkTheme: widget.isDarkTheme,
-                                onThemeChanged: widget.onThemeChanged,
-                              ),
-                            ),
+                                builder: (_) => const RegisterView()),
                           );
                         },
                   child: const Text('Нет аккаунта? Зарегистрироваться'),

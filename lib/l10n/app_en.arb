@@ -151,6 +151,22 @@
     "@editProfile": {
         "description": "Menu option for editing the profile"
     },
+    "cancelButton": "Cancel",
+    "@cancelButton": {
+        "description": "Button text for exiting (e.g., on the victory screen)"
+    },
+  "profileSaved": "The profile has been updated",
+  "@profileSaved": {
+    "description": "The profile has been updated"
+  },
+  "saveButton": "Save",
+  "@saveButton": {
+    "description": "Save"
+  },
+  "editButton": "Edit",
+  "@editButton": {
+    "description": "Edit"
+  },
     "parameters": "Parameters",
     "@parameters": {
         "description": "Menu option for additional settings"
