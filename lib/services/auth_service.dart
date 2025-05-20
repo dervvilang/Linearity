@@ -40,7 +40,7 @@ class AuthService {
       id: uid,
       email: email,
       username: username,
-      avatarUrl: 'lib/assets/icons/avatar_2.svg',
+      avatarUrl: null,
       description: '',
       score: 0,
       rank: 0,

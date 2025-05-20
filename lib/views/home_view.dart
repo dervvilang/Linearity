@@ -1,8 +1,11 @@
+// lib/views/home_view.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:linearity/models/task_type.dart';
 import 'package:linearity/themes/additional_colors.dart';
@@ -47,8 +50,10 @@ class _HomeViewState extends State<HomeView> {
           _lastPressed = now;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Нажмите ещё раз для выхода',
-                  style: TextStyle(color: colors.text)),
+              content: Text(
+                'Нажмите ещё раз для выхода',
+                style: TextStyle(color: colors.text),
+              ),
               backgroundColor: colors.secondary,
             ),
           );
@@ -73,9 +78,11 @@ class _HomeViewState extends State<HomeView> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(loc.helloUser,
-                            style: theme.textTheme.headlineLarge
-                                ?.copyWith(color: colors.greetingText)),
+                        Text(
+                          loc.helloUser,
+                          style: theme.textTheme.headlineLarge
+                              ?.copyWith(color: colors.greetingText),
+                        ),
                         Text(user.username,
                             style: theme.textTheme.headlineMedium),
                       ],
@@ -88,16 +95,21 @@ class _HomeViewState extends State<HomeView> {
                               builder: (_) => const ProfileView()),
                         );
                       },
-                      child: user.avatarUrl.startsWith('http')
+                      child: (user.avatarUrl != null &&
+                              user.avatarUrl!.startsWith('http'))
                           ? CircleAvatar(
                               radius: 24,
-                              backgroundImage: NetworkImage(user.avatarUrl),
+                              backgroundImage:
+                                  CachedNetworkImageProvider(user.avatarUrl!),
                             )
-                          : SvgPicture.asset(
-                              user.avatarUrl,
-                              width: 48,
-                              height: 48,
-                              color: colors.text,
+                          : CircleAvatar(
+                              radius: 24,
+                              backgroundColor: Colors.transparent,
+                              child: SvgPicture.asset(
+                                'lib/assets/icons/avatar_2.svg',
+                                width: 48,
+                                height: 48,
+                              ),
                             ),
                     ),
                   ],
@@ -201,9 +213,8 @@ class _HomeViewState extends State<HomeView> {
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const LevelsListView(
-                                  taskType: TaskType.medium),
-                            ),
+                                builder: (_) => const LevelsListView(
+                                    taskType: TaskType.medium)),
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -218,9 +229,8 @@ class _HomeViewState extends State<HomeView> {
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const LevelsListView(
-                                  taskType: TaskType.hard),
-                            ),
+                                builder: (_) => const LevelsListView(
+                                    taskType: TaskType.hard)),
                           ),
                         ),
                         const SizedBox(height: 14),
@@ -232,7 +242,6 @@ class _HomeViewState extends State<HomeView> {
             ],
           ),
         ),
-
         bottomNavigationBar: SafeArea(
           child: BottomNavigationBar(
             currentIndex: _currentIndex,

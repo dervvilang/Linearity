@@ -1,27 +1,12 @@
 /// Модель пользователя для хранения в Firestore и в приложении.
 class AppUser {
-  /// Уникальный ID пользователя (например, из FirebaseAuth.uid)
   final String id;
-
-  /// Email, используется для входа
   final String email;
-
-  /// Никнейм, задаётся при регистрации
   final String username;
-
-  /// URL аватарки; по умолчанию — локальный SVG из assets
-  final String avatarUrl;
-
-  /// Описание профиля; может быть пустым
+  final String? avatarUrl;
   final String description;
-
-  /// Накопленные баллы за решения
   final int score;
-
-  /// Позиция в рейтинге (0 означает «не рассчитано»)
   final int rank;
-
-  /// Тема, предпочитаемая пользователем: "light" или "dark"
   final String userTheme;
 
   /// Конструктор
@@ -29,8 +14,7 @@ class AppUser {
     required this.id,
     required this.email,
     required this.username,
-    this.avatarUrl =
-        'lib/assets/icons/avatar_2.svg',
+    this.avatarUrl,
     this.description = '',
     this.score = 0,
     this.rank = 0,
@@ -43,8 +27,7 @@ class AppUser {
       id: map['id'] as String,
       email: map['email'] as String,
       username: map['username'] as String,
-      avatarUrl: map['avatarUrl'] as String? ??
-          'lib/assets/icons/avatar_2.svg',
+      avatarUrl: map['avatarUrl'] as String?,
       description: map['description'] as String? ?? '',
       score: (map['score'] as num?)?.toInt() ?? 0,
       rank: (map['rank'] as num?)?.toInt() ?? 0,
@@ -54,16 +37,19 @@ class AppUser {
 
   /// Преобразование в Map для записи в Firestore
   Map<String, dynamic> toMap() {
-    return {
+    final data = <String, dynamic>{
       'id': id,
       'email': email,
       'username': username,
-      'avatarUrl': avatarUrl,
       'description': description,
       'score': score,
       'rank': rank,
       'userTheme': userTheme,
     };
+    if (avatarUrl != null) {
+      data['avatarUrl'] = avatarUrl;
+    }
+    return data;
   }
 
   /// Удобный copyWith для обновления части полей

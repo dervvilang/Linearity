@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:linearity/themes/additional_colors.dart';
 import 'package:linearity/view_models/auth_vm.dart';
@@ -35,8 +36,7 @@ class ProfileView extends StatelessWidget {
     // 2) Если не залогинен — редиректим на логин
     if (user == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context)
-            .pushNamedAndRemoveUntil('/login', (_) => false);
+        Navigator.of(context).pushNamedAndRemoveUntil('/login', (_) => false);
       });
       return const Scaffold(body: SizedBox.shrink());
     }
@@ -104,15 +104,16 @@ class ProfileView extends StatelessWidget {
                   radius: 75,
                   backgroundColor: Colors.transparent,
                   child: ClipOval(
-                    child: user.avatarUrl.startsWith('http')
-                        ? Image.network(
-                            user.avatarUrl,
+                    child: (user.avatarUrl != null &&
+                            user.avatarUrl!.startsWith('http'))
+                        ? CachedNetworkImage(
+                            imageUrl: user.avatarUrl!,
                             width: 150,
                             height: 150,
                             fit: BoxFit.cover,
                           )
                         : SvgPicture.asset(
-                            user.avatarUrl,
+                            'lib/assets/icons/avatar_2.svg',
                             width: 135,
                             height: 135,
                             fit: BoxFit.cover,

@@ -86,38 +86,51 @@ class EditProfileViewModel extends ChangeNotifier {
 
   Future<void> saveChanges() async {
     _setLoading(true);
-    final uid = fb_auth.FirebaseAuth.instance.currentUser!.uid;
+    try {
+      final uid = fb_auth.FirebaseAuth.instance.currentUser!.uid;
 
-    // Аватар
-    if (avatarFile != null) {
-      final url = await _storageService.uploadAvatar(avatarFile!, uid);
-      await _authService.updateProfileFields(uid: uid, avatarUrl: url);
-    }
-    // Email
-    if (email != _origEmail) {
-      await _authService.updateEmail(email, currentPassword);
-    }
-    // Пароль
-    if (newPassword.isNotEmpty) {
-      await _authService.updatePassword(newPassword, currentPassword);
-    }
-    // Никнейм
-    if (username != _origUsername) {
-      await _authService.updateProfileFields(uid: uid, username: username);
-    }
+      // Аватар
+      if (avatarFile != null) {
+        final url = await _storageService.uploadAvatar(avatarFile!, uid);
+        await _authService.updateProfileFields(uid: uid, avatarUrl: url);
+        avatarUrl = url;
+        avatarFile = null;
+        notifyListeners();
+      }
 
-    _setLoading(false);
+      // Email
+      if (email != _origEmail) {
+        await _authService.updateEmail(email, currentPassword);
+      }
+
+      // Пароль
+      if (newPassword.isNotEmpty) {
+        await _authService.updatePassword(newPassword, currentPassword);
+      }
+
+      // Никнейм
+      if (username != _origUsername) {
+        await _authService.updateProfileFields(uid: uid, username: username);
+      }
+    } catch (e) {
+      // Вы можете показать SnackBar или логировать ошибку здесь,
+      // но главное — не забыть сбросить флаг загрузки в finally
+      rethrow;
+    } finally {
+      _setLoading(false);
+    }
   }
 
   Future<void> deleteAccount() async {
     _setLoading(true);
-    final uid = fb_auth.FirebaseAuth.instance.currentUser!.uid;
-
-    await _firestoreService.deleteUserDoc(uid);
-    await _storageService.deleteAvatar(uid);
-    await _authService.deleteAccount();
-
-    _setLoading(false);
+    try {
+      final uid = fb_auth.FirebaseAuth.instance.currentUser!.uid;
+      await _firestoreService.deleteUserDoc(uid);
+      await _storageService.deleteAvatar(uid);
+      await _authService.deleteAccount();
+    } finally {
+      _setLoading(false);
+    }
   }
 
   void _setLoading(bool value) {

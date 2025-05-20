@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../view_models/edit_profile_vm.dart';
 
 class EditProfileView extends StatefulWidget {
@@ -16,6 +18,31 @@ class _EditProfileViewState extends State<EditProfileView> {
   Widget build(BuildContext context) {
     final vm = context.watch<EditProfileViewModel>();
     final loc = AppLocalizations.of(context)!;
+
+    Widget _buildAvatar() {
+      if (vm.avatarFile != null) {
+        return CircleAvatar(
+          radius: 50,
+          backgroundImage: FileImage(vm.avatarFile!),
+        );
+      }
+      if (vm.avatarUrl != null && vm.avatarUrl!.startsWith('http')) {
+        return CircleAvatar(
+          radius: 50,
+          backgroundImage: CachedNetworkImageProvider(vm.avatarUrl!),
+        );
+      }
+      // дефолтный SVG из assets
+      return CircleAvatar(
+        radius: 50,
+        backgroundColor: Colors.transparent,
+        child: SvgPicture.asset(
+          'lib/assets/icons/avatar_2.svg',
+          width: 100,
+          height: 100,
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -35,14 +62,7 @@ class _EditProfileViewState extends State<EditProfileView> {
                     Center(
                       child: GestureDetector(
                         onTap: vm.pickAvatar,
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundImage: vm.avatarFile != null
-                              ? FileImage(vm.avatarFile!)
-                              : (vm.avatarUrl != null
-                                  ? NetworkImage(vm.avatarUrl!)
-                                  : AssetImage('lib/assets/icons/avatar_2.svg') as ImageProvider),
-                        ),
+                        child: _buildAvatar(),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -64,7 +84,8 @@ class _EditProfileViewState extends State<EditProfileView> {
                         ),
                       ),
                       onChanged: vm.setUsername,
-                      validator: (v) => v == null || v.isEmpty ? loc.fieldRequired : null,
+                      validator: (v) =>
+                          v == null || v.isEmpty ? loc.fieldRequired : null,
                     ),
                     const SizedBox(height: 16),
 
@@ -81,7 +102,8 @@ class _EditProfileViewState extends State<EditProfileView> {
                       onChanged: vm.setEmail,
                       validator: (v) {
                         if (v == null || v.isEmpty) return loc.fieldRequired;
-                        final emailReg = RegExp(r"^[\w\-.]+@([\w\-]+\.)+[\w\-]{2,4}\$");
+                        final emailReg =
+                            RegExp(r"^[\w\-.]+@([\w\-]+\.)+[\w\-]{2,4}$");
                         return emailReg.hasMatch(v) ? null : loc.invalidEmail;
                       },
                     ),
@@ -108,8 +130,10 @@ class _EditProfileViewState extends State<EditProfileView> {
 
                     // Сохранить
                     ElevatedButton(
-                      onPressed: vm.hasChanges && _formKey.currentState!.validate()
+                      onPressed: vm.hasChanges
                           ? () async {
+                              final form = _formKey.currentState;
+                              if (form == null || !form.validate()) return;
                               try {
                                 await vm.saveChanges();
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -156,7 +180,8 @@ class _EditProfileViewState extends State<EditProfileView> {
                         if (confirmed == true) {
                           try {
                             await vm.deleteAccount();
-                            Navigator.pushNamedAndRemoveUntil(context, '/login', (_) => false);
+                            Navigator.pushNamedAndRemoveUntil(
+                                context, '/login', (_) => false);
                           } catch (e) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text(e.toString())),

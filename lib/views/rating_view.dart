@@ -1,3 +1,5 @@
+// lib/views/rating_view.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -41,8 +43,10 @@ class _RatingViewState extends State<RatingView> {
           _lastPressed = now;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Нажмите ещё раз для выхода',
-                  style: TextStyle(color: colors.text)),
+              content: Text(
+                'Нажмите ещё раз для выхода',
+                style: TextStyle(color: colors.text),
+              ),
               backgroundColor: colors.secondary,
             ),
           );
@@ -60,9 +64,11 @@ class _RatingViewState extends State<RatingView> {
             child: Container(
               alignment: Alignment.bottomCenter,
               padding: const EdgeInsets.only(bottom: 8),
-              child: Text(loc.ratingTitle,
-                  style: theme.textTheme.headlineLarge
-                      ?.copyWith(color: colors.text)),
+              child: Text(
+                loc.ratingTitle,
+                style: theme.textTheme.headlineLarge
+                    ?.copyWith(color: colors.text),
+              ),
             ),
           ),
         ),
@@ -84,7 +90,7 @@ class _RatingViewState extends State<RatingView> {
                   return UserInRank(
                     rank: u.rank,
                     username: u.username,
-                    avatarUrl: u.avatarUrl,
+                    avatarUrl: u.avatarUrl ?? 'lib/assets/icons/avatar_2.svg',
                     score: u.score,
                     isOnBlueBackground: true,
                   );
@@ -99,7 +105,7 @@ class _RatingViewState extends State<RatingView> {
                   return UserInRank(
                     rank: u.rank,
                     username: u.username,
-                    avatarUrl: u.avatarUrl,
+                    avatarUrl: u.avatarUrl ?? 'lib/assets/icons/avatar_2.svg',
                     score: u.score,
                   );
                 },
@@ -143,11 +149,15 @@ class _RatingViewState extends State<RatingView> {
             ],
             onTap: (index) {
               if (index == 0) {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const HomeView()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const HomeView()));
               } else if (index == 2) {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const ProfileView()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const ProfileView()));
               }
             },
           ),
