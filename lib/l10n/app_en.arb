@@ -4,9 +4,9 @@
     "@welcomeTitle": {
         "description": "Title on the welcome screen (login)"
     },
-    "emailLabel": "Email or username",
+    "emailLabel": "Email",
     "@emailLabel": {
-        "description": "Label for the email or username input field"
+        "description": "Label for the email input field"
     },
     "passwordLabel": "Password",
     "@passwordLabel": {

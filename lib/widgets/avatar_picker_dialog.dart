@@ -1,0 +1,51 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+/// Диалог, в котором пользователь выбирает один из предустановленных SVG-аватаров.
+class AvatarPickerDialog extends StatelessWidget {
+  static const _avatars = [
+    'lib/assets/icons/avatar_1.svg',
+    'lib/assets/icons/avatar_2.svg',
+  ];
+
+  const AvatarPickerDialog({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Выберите аватар',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 12),
+            GridView.builder(
+              shrinkWrap: true,
+              itemCount: _avatars.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+              ),
+              itemBuilder: (ctx, i) {
+                final asset = _avatars[i];
+                return GestureDetector(
+                  onTap: () => Navigator.pop(context, asset),
+                  child: SvgPicture.asset(
+                    asset,
+                    width: 64,
+                    height: 64,
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

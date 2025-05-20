@@ -1,61 +1,55 @@
-/// Модель пользователя для хранения в Firestore и в приложении.
+// lib/models/user.dart
+
 class AppUser {
   final String id;
   final String email;
   final String username;
-  final String? avatarUrl;
+  final String avatarAsset; 
   final String description;
   final int score;
   final int rank;
-  final String userTheme;
 
-  /// Конструктор
   AppUser({
     required this.id,
     required this.email,
     required this.username,
-    this.avatarUrl,
+    required this.avatarAsset,
     this.description = '',
     this.score = 0,
     this.rank = 0,
-    this.userTheme = 'light',
   });
 
-  /// Преобразование из Map (например, документ Firestore)
+  /// Создаёт AppUser из карты (например, из документа Firestore).
   factory AppUser.fromMap(Map<String, dynamic> map) {
     return AppUser(
       id: map['id'] as String,
       email: map['email'] as String,
       username: map['username'] as String,
-      avatarUrl: map['avatarUrl'] as String?,
+      avatarAsset: map['avatarAsset'] as String? 
+          ?? 'lib/assets/icons/avatar_2.svg',
       description: map['description'] as String? ?? '',
       score: (map['score'] as num?)?.toInt() ?? 0,
       rank: (map['rank'] as num?)?.toInt() ?? 0,
-      userTheme: map['userTheme'] as String? ?? 'light',
     );
   }
 
-  /// Преобразование в Map для записи в Firestore
+  /// Преобразует AppUser в карту для записи в Firestore.
   Map<String, dynamic> toMap() {
-    final data = <String, dynamic>{
+    return {
       'id': id,
       'email': email,
       'username': username,
+      'avatarAsset': avatarAsset,
       'description': description,
       'score': score,
       'rank': rank,
-      'userTheme': userTheme,
     };
-    if (avatarUrl != null) {
-      data['avatarUrl'] = avatarUrl;
-    }
-    return data;
   }
 
-  /// Удобный copyWith для обновления части полей
+  /// Возвращает копию AppUser с обновлёнными полями.
   AppUser copyWith({
     String? username,
-    String? avatarUrl,
+    String? avatarAsset,
     String? description,
     int? score,
     int? rank,
@@ -65,11 +59,10 @@ class AppUser {
       id: id,
       email: email,
       username: username ?? this.username,
-      avatarUrl: avatarUrl ?? this.avatarUrl,
+      avatarAsset: avatarAsset ?? this.avatarAsset,
       description: description ?? this.description,
       score: score ?? this.score,
       rank: rank ?? this.rank,
-      userTheme: userTheme ?? this.userTheme,
     );
   }
 }

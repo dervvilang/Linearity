@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:linearity/themes/additional_colors.dart';
 import 'package:linearity/view_models/auth_vm.dart';
@@ -26,22 +25,19 @@ class ProfileView extends StatelessWidget {
     final authVm = context.watch<AuthViewModel>();
     final user = authVm.user;
 
-    // 1) Если мы еще грузим состояние аутентификации — показываем спиннер
     if (authVm.isLoading && user == null) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
     }
-
-    // 2) Если не залогинен — редиректим на логин
     if (user == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pushNamedAndRemoveUntil('/login', (_) => false);
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil('/login', (_) => false);
       });
       return const Scaffold(body: SizedBox.shrink());
     }
 
-    // 3) Здесь уже точно есть user и мы не в процессе его загрузки
     DateTime? lastPressed;
     return WillPopScope(
       onWillPop: () async {
@@ -68,7 +64,7 @@ class ProfileView extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                // Кнопка «Настройки»
+                // Настройки
                 Align(
                   alignment: Alignment.topRight,
                   child: Material(
@@ -103,21 +99,11 @@ class ProfileView extends StatelessWidget {
                 CircleAvatar(
                   radius: 75,
                   backgroundColor: Colors.transparent,
-                  child: ClipOval(
-                    child: (user.avatarUrl != null &&
-                            user.avatarUrl!.startsWith('http'))
-                        ? CachedNetworkImage(
-                            imageUrl: user.avatarUrl!,
-                            width: 150,
-                            height: 150,
-                            fit: BoxFit.cover,
-                          )
-                        : SvgPicture.asset(
-                            'lib/assets/icons/avatar_2.svg',
-                            width: 135,
-                            height: 135,
-                            fit: BoxFit.cover,
-                          ),
+                  child: SvgPicture.asset(
+                    user.avatarAsset,
+                    width: 150,
+                    height: 150,
+                    fit: BoxFit.cover,
                   ),
                 ),
                 const SizedBox(height: 16),

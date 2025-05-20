@@ -1,58 +1,66 @@
-import 'dart:io';
+// lib/view_models/edit_profile_vm.dart
+
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import '../services/auth_service.dart';
-import '../services/firestore_service.dart';
-import '../services/storage_service.dart';
-import 'package:provider/provider.dart';
-import 'auth_vm.dart';
+import '../services/firestore_service.dart';           // если нужен для удаления
+import '../view_models/auth_vm.dart';
 
 class EditProfileViewModel extends ChangeNotifier {
   final AuthService _authService;
   final FirestoreService _firestoreService;
-  final StorageService _storageService;
-  final ImagePicker _picker = ImagePicker();
 
-  // Исходные данные
+  /// Список всех предустановленных SVG-аватарок
+  final List<String> availableAvatars = [
+    'lib/assets/icons/avatar_1.svg',
+    'lib/assets/icons/avatar_2.svg',
+    // при необходимости добавьте ещё
+  ];
+
+  // Оригинальные значения для сравнения
   final String _origUsername;
   final String _origEmail;
-  final String? _origAvatarUrl;
+  final String _origAvatarAsset;
 
-  // Поля формы
+  // Поля, которыми оперируем в форме
   String username;
   String email;
+  String avatarAsset;
   String currentPassword = '';
   String newPassword = '';
-  File? avatarFile;
-  String? avatarUrl;
 
   bool _isLoading = false;
-
-  EditProfileViewModel(BuildContext context,
-      {AuthService? authService,
-      FirestoreService? firestoreService,
-      StorageService? storageService})
-      : _authService = authService ?? AuthService(),
-        _firestoreService = firestoreService ?? FirestoreService(),
-        _storageService = storageService ?? StorageService(),
-        _origUsername = context.read<AuthViewModel>().user!.username,
-        _origEmail = context.read<AuthViewModel>().user!.email,
-        _origAvatarUrl = context.read<AuthViewModel>().user!.avatarUrl,
-        username = context.read<AuthViewModel>().user!.username,
-        email = context.read<AuthViewModel>().user!.email,
-        avatarUrl = context.read<AuthViewModel>().user!.avatarUrl;
-
   bool get isLoading => _isLoading;
 
+  /// Конструктор, подтягивает текущие данные из AuthViewModel
+  EditProfileViewModel(BuildContext context, {
+    AuthService? authService,
+    FirestoreService? firestoreService,
+  })  : _authService = authService ?? AuthService(),
+        _firestoreService = firestoreService ?? FirestoreService(),
+        _origUsername = context.read<AuthViewModel>().user!.username,
+        _origEmail = context.read<AuthViewModel>().user!.email,
+        _origAvatarAsset = context.read<AuthViewModel>().user!.avatarAsset,
+        username = context.read<AuthViewModel>().user!.username,
+        email = context.read<AuthViewModel>().user!.email,
+        avatarAsset = context.read<AuthViewModel>().user!.avatarAsset;
+
+  /// Есть ли изменения, чтобы активировать кнопку «Сохранить»
   bool get hasChanges {
-    return username != _origUsername ||
-        email != _origEmail ||
-        newPassword.isNotEmpty ||
-        avatarFile != null;
+    final avatarChanged = avatarAsset != _origAvatarAsset;
+    final usernameChanged = username != _origUsername;
+    final emailChanged = email != _origEmail && currentPassword.isNotEmpty;
+    final passwordChanged = newPassword.isNotEmpty && currentPassword.isNotEmpty;
+    return avatarChanged || usernameChanged || emailChanged || passwordChanged;
   }
 
-  // Сеттеры
+  /// Установить новый аватар
+  void setAvatarAsset(String asset) {
+    avatarAsset = asset;
+    notifyListeners();
+  }
+
   void setUsername(String v) {
     username = v.trim();
     notifyListeners();
@@ -73,32 +81,20 @@ class EditProfileViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> pickAvatar() async {
-    final picked = await _picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 80,
-    );
-    if (picked != null) {
-      avatarFile = File(picked.path);
-      notifyListeners();
-    }
-  }
-
   Future<void> saveChanges() async {
     _setLoading(true);
     try {
       final uid = fb_auth.FirebaseAuth.instance.currentUser!.uid;
 
       // Аватар
-      if (avatarFile != null) {
-        final url = await _storageService.uploadAvatar(avatarFile!, uid);
-        await _authService.updateProfileFields(uid: uid, avatarUrl: url);
-        avatarUrl = url;
-        avatarFile = null;
-        notifyListeners();
+      if (avatarAsset != _origAvatarAsset) {
+        await _authService.updateProfileFields(
+          uid: uid,
+          avatarAsset: avatarAsset,
+        );
       }
 
-      // Email
+      // Email (с реаутентификацией)
       if (email != _origEmail) {
         await _authService.updateEmail(email, currentPassword);
       }
@@ -110,12 +106,11 @@ class EditProfileViewModel extends ChangeNotifier {
 
       // Никнейм
       if (username != _origUsername) {
-        await _authService.updateProfileFields(uid: uid, username: username);
+        await _authService.updateProfileFields(
+          uid: uid,
+          username: username,
+        );
       }
-    } catch (e) {
-      // Вы можете показать SnackBar или логировать ошибку здесь,
-      // но главное — не забыть сбросить флаг загрузки в finally
-      rethrow;
     } finally {
       _setLoading(false);
     }
@@ -126,15 +121,14 @@ class EditProfileViewModel extends ChangeNotifier {
     try {
       final uid = fb_auth.FirebaseAuth.instance.currentUser!.uid;
       await _firestoreService.deleteUserDoc(uid);
-      await _storageService.deleteAvatar(uid);
       await _authService.deleteAccount();
     } finally {
       _setLoading(false);
     }
   }
 
-  void _setLoading(bool value) {
-    _isLoading = value;
+  void _setLoading(bool v) {
+    _isLoading = v;
     notifyListeners();
   }
 }

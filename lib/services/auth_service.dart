@@ -1,4 +1,5 @@
 // lib/services/auth_service.dart
+
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:linearity/models/user.dart';
@@ -7,7 +8,7 @@ import 'package:linearity/models/user.dart';
 class AuthService {
   final fb_auth.FirebaseAuth _auth = fb_auth.FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  
+
   /// Поток AppUser?, который
   /// 1) слушает authStateChanges() для входа/выхода,
   /// 2) при залогине переключается на snapshots() документа Firestore,
@@ -40,11 +41,10 @@ class AuthService {
       id: uid,
       email: email,
       username: username,
-      avatarUrl: null,
+      avatarAsset: 'lib/assets/icons/avatar_2.svg',
       description: '',
       score: 0,
       rank: 0,
-      userTheme: 'light',
     );
 
     await _firestore.collection('users').doc(uid).set(newUser.toMap());
@@ -73,17 +73,17 @@ class AuthService {
     await _auth.signOut();
   }
 
-  /// Обновить любые поля профиля (username, avatarUrl, description).
+  /// Обновить любые поля профиля (username, avatarAsset, description).
   /// Если передано null — поле не меняется.
   Future<void> updateProfileFields({
     required String uid,
     String? username,
-    String? avatarUrl,
+    String? avatarAsset,
     String? description,
   }) async {
     final data = <String, dynamic>{};
-    if (username != null) data['username'] = username;
-    if (avatarUrl != null) data['avatarUrl'] = avatarUrl;
+    if (username != null)    data['username']    = username;
+    if (avatarAsset != null) data['avatarAsset'] = avatarAsset;
     if (description != null) data['description'] = description;
     if (data.isNotEmpty) {
       await _firestore.collection('users').doc(uid).update(data);
@@ -93,40 +93,44 @@ class AuthService {
   /// Update user email with reauthentication
   Future<void> updateEmail(String newEmail, String currentPassword) async {
     final user = _auth.currentUser;
-    if (user == null) throw fb_auth.FirebaseAuthException(code: 'no-user', message: 'User not signed in.');
+    if (user == null) throw fb_auth.FirebaseAuthException(
+      code: 'no-user', message: 'User not signed in.');
 
-    // Reauthenticate
     final cred = fb_auth.EmailAuthProvider.credential(
       email: user.email!,
       password: currentPassword,
     );
     await user.reauthenticateWithCredential(cred);
 
-    // Update email
     await user.updateEmail(newEmail);
     await user.sendEmailVerification();
+
+    // Также синхронизируем email в Firestore
+    await _firestore.collection('users').doc(user.uid).update({
+      'email': newEmail,
+    });
   }
 
   /// Update user password; requires recent login
   Future<void> updatePassword(String newPassword, String currentPassword) async {
     final user = _auth.currentUser;
-    if (user == null) throw fb_auth.FirebaseAuthException(code: 'no-user', message: 'User not signed in.');
+    if (user == null) throw fb_auth.FirebaseAuthException(
+      code: 'no-user', message: 'User not signed in.');
 
-    // Reauthenticate
     final cred = fb_auth.EmailAuthProvider.credential(
       email: user.email!,
       password: currentPassword,
     );
     await user.reauthenticateWithCredential(cred);
 
-    // Update password
     await user.updatePassword(newPassword);
   }
 
   /// Delete user account entirely (Auth only)
   Future<void> deleteAccount() async {
     final user = _auth.currentUser;
-    if (user == null) throw fb_auth.FirebaseAuthException(code: 'no-user', message: 'User not signed in.');
+    if (user == null) throw fb_auth.FirebaseAuthException(
+      code: 'no-user', message: 'User not signed in.');
 
     await user.delete();
   }

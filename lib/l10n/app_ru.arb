@@ -4,9 +4,9 @@
   "@welcomeTitle": {
     "description": "Заголовок на экране приветствия"
   },
-  "emailLabel": "Email или имя пользователя",
+  "emailLabel": "Email",
   "@emailLabel": {
-    "description": "Подпись поля для ввода email или имени пользователя"
+    "description": "Подпись поля для ввода email"
   },
   "passwordLabel": "Пароль",
   "@passwordLabel": {

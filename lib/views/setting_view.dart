@@ -107,13 +107,6 @@ class SettingView extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   SettingCard(
-                    title: loc.deleteAccount,
-                    onTap: () {/* TODO: логика удаления */},
-                    backColor: colors.alertRed,
-                    textColor: colors.errorRed,
-                  ),
-                  const SizedBox(height: 4),
-                  SettingCard(
                     title: loc.exitButton,
                     onTap: () async {
                       await context.read<AuthViewModel>().logout();
@@ -128,7 +121,8 @@ class SettingView extends StatelessWidget {
                   SettingCard(
                     title: loc.closeApp,
                     onTap: () => SystemNavigator.pop(),
-                    backColor: colors.ratingCard,
+                    backColor: colors.alertRed,
+                    textColor: colors.errorRed,
                   ),
                 ],
               ),

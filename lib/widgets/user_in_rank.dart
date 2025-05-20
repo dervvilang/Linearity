@@ -1,35 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:linearity/themes/additional_colors.dart';
 
 class UserInRank extends StatelessWidget {
   final String username;
-  final String avatarUrl;
+  final String avatarAsset;
   final int score;
   final int rank;
-  // Параметр, указывающий, на каком фоне отображается карточка
   final bool isOnBlueBackground;
 
   const UserInRank({
-    super.key,
+    Key? key,
     required this.username,
-    required this.avatarUrl,
+    required this.avatarAsset,
     required this.score,
     required this.rank,
     this.isOnBlueBackground = false,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final rankString = rank < 10 ? '0$rank' : '$rank';
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final additionalColors = theme.extension<AdditionalColors>()!;
+    final colors = theme.extension<AdditionalColors>()!;
 
-    // Если фон голубой, делаем текст номера белым, иначе — используем стандартный цвет.
     final rankTextColor =
-        isOnBlueBackground ? additionalColors.text : additionalColors.greetingText;
+        isOnBlueBackground ? colors.text : colors.greetingText;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
@@ -51,20 +49,23 @@ class UserInRank extends StatelessWidget {
               ),
               margin: EdgeInsets.zero,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 child: Row(
                   children: [
                     CircleAvatar(
                       radius: 24,
                       backgroundColor: Colors.transparent,
-                      child: SvgPicture.asset(
-                        avatarUrl,
-                        width: 48,
-                        height: 48,
+                      child: ClipOval(
+                        child: SvgPicture.asset(
+                          avatarAsset,
+                          width: 48,
+                          height: 48,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 16),
-                    // Оборачиваем колонку в Expanded, чтобы текст занимал оставшееся пространство
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

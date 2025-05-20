@@ -1,9 +1,7 @@
-// lib/views/rating_view.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:linearity/models/user.dart' as linearity_user;
 import 'package:linearity/themes/additional_colors.dart';
@@ -21,8 +19,19 @@ class RatingView extends StatefulWidget {
 class _RatingViewState extends State<RatingView> {
   DateTime? _lastPressed;
 
+  // Примерные данные — для реальных берём из Firestore/VM
   final List<linearity_user.AppUser> sampleUsers = [
-    // … ваш список …
+    // Пример:
+    // linearity_user.AppUser(
+    //   id: '1',
+    //   email: 'a@b.com',
+    //   username: 'User1',
+    //   avatarAsset: 'assets/icons/avatars/avatar1.svg',
+    //   description: '',
+    //   score: 100,
+    //   rank: 1,
+    //   userTheme: 'light',
+    // ),
   ];
 
   @override
@@ -66,14 +75,15 @@ class _RatingViewState extends State<RatingView> {
               padding: const EdgeInsets.only(bottom: 8),
               child: Text(
                 loc.ratingTitle,
-                style: theme.textTheme.headlineLarge
-                    ?.copyWith(color: colors.text),
+                style:
+                    theme.textTheme.headlineLarge?.copyWith(color: colors.text),
               ),
             ),
           ),
         ),
         body: Column(
           children: [
+            // Верхний блок: топ-3
             Container(
               width: double.infinity,
               height: fixedAreaHeight,
@@ -90,13 +100,15 @@ class _RatingViewState extends State<RatingView> {
                   return UserInRank(
                     rank: u.rank,
                     username: u.username,
-                    avatarUrl: u.avatarUrl ?? 'lib/assets/icons/avatar_2.svg',
+                    avatarAsset: u.avatarAsset,
                     score: u.score,
                     isOnBlueBackground: true,
                   );
                 }).toList(),
               ),
             ),
+
+            // Список остальных
             Expanded(
               child: ListView.builder(
                 itemCount: bottomUsers.length,
@@ -105,7 +117,7 @@ class _RatingViewState extends State<RatingView> {
                   return UserInRank(
                     rank: u.rank,
                     username: u.username,
-                    avatarUrl: u.avatarUrl ?? 'lib/assets/icons/avatar_2.svg',
+                    avatarAsset: u.avatarAsset,
                     score: u.score,
                   );
                 },
@@ -150,14 +162,14 @@ class _RatingViewState extends State<RatingView> {
             onTap: (index) {
               if (index == 0) {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => const HomeView()));
+                  context,
+                  MaterialPageRoute(builder: (_) => const HomeView()),
+                );
               } else if (index == 2) {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => const ProfileView()));
+                  context,
+                  MaterialPageRoute(builder: (_) => const ProfileView()),
+                );
               }
             },
           ),

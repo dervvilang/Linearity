@@ -1,4 +1,7 @@
+// lib/view_models/auth_vm.dart
+
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:linearity/models/user.dart';
 import 'package:linearity/services/auth_service.dart';
@@ -23,7 +26,7 @@ class AuthViewModel extends ChangeNotifier {
         notifyListeners();
       },
       onError: (_) {
-        // Игнорируем ошибки доступа сразу после signOut
+        // При ошибках (например, после signOut) просто сбрасываем состояние
         user = null;
         isLoading = false;
         notifyListeners();
@@ -86,13 +89,13 @@ class AuthViewModel extends ChangeNotifier {
   /// Выход из аккаунта.
   Future<void> logout() async {
     await _service.signOut();
-    // После signOut поток отдаст null и мы обновим состояние
+    // По authStateChanges получим null и обновим состояние
   }
 
-  /// Обновление полей профиля (username, avatarUrl, description).
+  /// Обновление полей профиля (username, avatarAsset, description).
   Future<void> updateProfile({
     String? username,
-    String? avatarUrl,
+    String? avatarAsset,
     String? description,
   }) async {
     if (user == null) return;
@@ -106,14 +109,14 @@ class AuthViewModel extends ChangeNotifier {
       await _service.updateProfileFields(
         uid: uid,
         username: username,
-        avatarUrl: avatarUrl,
+        avatarAsset: avatarAsset,
         description: description,
       );
 
       // Локально обновляем модель
       user = user!.copyWith(
         username: username,
-        avatarUrl: avatarUrl,
+        avatarAsset: avatarAsset,
         description: description,
       );
     } catch (e) {
