@@ -10,7 +10,7 @@ import 'package:linearity/views/profile_view.dart';
 import 'package:linearity/widgets/user_in_rank.dart';
 
 class RatingView extends StatefulWidget {
-  const RatingView({Key? key}) : super(key: key);
+  const RatingView({super.key});
 
   @override
   State<RatingView> createState() => _RatingViewState();

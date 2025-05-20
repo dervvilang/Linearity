@@ -15,7 +15,7 @@ import 'package:linearity/widgets/editable_about_me_card.dart';
 import 'package:linearity/widgets/rating_card.dart';
 
 class ProfileView extends StatelessWidget {
-  const ProfileView({Key? key}) : super(key: key);
+  const ProfileView({super.key});
 
   @override
   Widget build(BuildContext context) {

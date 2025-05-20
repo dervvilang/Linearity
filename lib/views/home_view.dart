@@ -14,7 +14,7 @@ import 'package:linearity/widgets/category_card.dart';
 import 'package:linearity/widgets/rating_card.dart';
 
 class HomeView extends StatefulWidget {
-  const HomeView({Key? key}) : super(key: key);
+  const HomeView({super.key});
 
   @override
   State<HomeView> createState() => _HomeViewState();

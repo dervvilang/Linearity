@@ -1,16 +1,17 @@
-// lib/main.dart
-
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'firebase_options.dart';
 import 'themes/theme.dart';
 import 'services/firestore_service.dart';
+import 'services/notification_service.dart';
 import 'view_models/theme_vm.dart';
+import 'view_models/notification_vm.dart';
 import 'view_models/auth_vm.dart';
 import 'view_models/level_selection_vm.dart';
 import 'view_models/task_vm.dart';
@@ -20,19 +21,26 @@ import 'views/home_view.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   // Прозрачная навигационная панель
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(systemNavigationBarColor: Colors.transparent),
   );
+
+  // Инициализируем NotificationService и SharedPreferences
+  final notifSvc = NotificationService();
+  await notifSvc.init();
+  final prefs = await SharedPreferences.getInstance();
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider<ThemeViewModel>(
           create: (_) => ThemeViewModel(),
+        ),
+        ChangeNotifierProvider<NotificationViewModel>(
+          create: (_) => NotificationViewModel(notifSvc, prefs),
         ),
         ChangeNotifierProvider<AuthViewModel>(
           create: (_) => AuthViewModel(),
@@ -54,13 +62,10 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
+  const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    // Смотрим только локальный флаг темы
     final themeVm = context.watch<ThemeViewModel>();
-    // Состояние аутентификации
     final authVm = context.watch<AuthViewModel>();
 
     return MaterialApp(
@@ -76,7 +81,6 @@ class MyApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('ru'), Locale('en')],
-      // Стартовый экран: спиннер → логин → домашний
       home: authVm.isLoading
           ? const Scaffold(
               body: Center(child: CircularProgressIndicator()),

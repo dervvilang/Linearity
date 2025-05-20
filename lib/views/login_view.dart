@@ -7,7 +7,7 @@ import 'package:linearity/views/register_view.dart';
 import 'package:linearity/views/home_view.dart';
 
 class LoginView extends StatefulWidget {
-  const LoginView({Key? key}) : super(key: key);
+  const LoginView({super.key});
 
   @override
   State<LoginView> createState() => _LoginViewState();
