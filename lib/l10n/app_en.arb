@@ -190,5 +190,49 @@
     "languageLabel": "Language:",
     "@languageLabel": {
         "description": "Label for the language switcher"
-    }
+    },
+      "editProfileTitle": "Edit Profile",
+  "@editProfileTitle": {
+    "description": "Title of the screen for editing user profile"
+  },
+  "changeAvatar": "Change Avatar",
+  "@changeAvatar": {
+    "description": "Label for the button to pick a new avatar image"
+  },
+  "displayNameLabel": "Name",
+  "@displayNameLabel": {
+    "description": "Label for the user's display name field"
+  },
+  "usernameLabel": "Username",
+  "@usernameLabel": {
+    "description": "Label for the user's username field"
+  },
+  "fieldRequired": "This field is required",
+  "@fieldRequired": {
+    "description": "Validation message when a required field is left empty"
+  },
+  "invalidEmail": "Invalid email format",
+  "@invalidEmail": {
+    "description": "Validation message when email does not match pattern"
+  },
+  "passwordTooShort": "Password must be at least 6 characters",
+  "@passwordTooShort": {
+    "description": "Validation message when password is too short"
+  },
+  "saveChanges": "Save",
+  "@saveChanges": {
+    "description": "Label for button to save profile changes"
+  },
+  "profileUpdated": "Profile updated",
+  "@profileUpdated": {
+    "description": "Snackbar message after successful profile update"
+  },
+  "deleteAccountConfirm": "Are you sure you want to delete your account? This action cannot be undone.",
+  "@deleteAccountConfirm": {
+    "description": "Confirmation message shown before deleting account"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Label for cancel button in dialogs"
+  }
 }

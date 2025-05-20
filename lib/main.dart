@@ -15,6 +15,9 @@ import 'view_models/notification_vm.dart';
 import 'view_models/auth_vm.dart';
 import 'view_models/level_selection_vm.dart';
 import 'view_models/task_vm.dart';
+// Добавили импорт для экрана редактирования профиля
+import 'view_models/edit_profile_vm.dart';
+import 'views/edit_profile_view.dart';
 import 'views/login_view.dart';
 import 'views/register_view.dart';
 import 'views/home_view.dart';
@@ -92,6 +95,11 @@ class MyApp extends StatelessWidget {
         '/login': (_) => const LoginView(),
         '/register': (_) => const RegisterView(),
         '/home': (_) => const HomeView(),
+        // Добавили маршрут для редактирования профиля
+        '/editProfile': (ctx) => ChangeNotifierProvider<EditProfileViewModel>(
+              create: (_) => EditProfileViewModel(ctx),
+              child: EditProfileView(),
+            ),
       },
     );
   }

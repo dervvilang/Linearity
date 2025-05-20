@@ -1,3 +1,4 @@
+// lib/services/auth_service.dart
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:linearity/models/user.dart';
@@ -6,24 +7,19 @@ import 'package:linearity/models/user.dart';
 class AuthService {
   final fb_auth.FirebaseAuth _auth = fb_auth.FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
+  
   /// Поток AppUser?, который
   /// 1) слушает authStateChanges() для входа/выхода,
   /// 2) при залогине переключается на snapshots() документа Firestore,
   ///    чтобы при любом изменении профиля отдавать новое значение.
   Stream<AppUser?> get user {
     return _auth.authStateChanges().asyncExpand((fbUser) {
-      // если вышли — сразу кидаем null и завершаем прослушку документа
       if (fbUser == null) return Stream.value(null);
-
-      // иначе слушаем документ, но игнорируем ошибки доступа после signOut
       return _firestore
           .collection('users')
           .doc(fbUser.uid)
           .snapshots()
-          .handleError((_) {
-            // поглощаем ошибки (PERMISSION_DENIED и т.п.)
-          })
+          .handleError((_) {})
           .map((snap) => snap.exists ? AppUser.fromMap(snap.data()!) : null);
     });
   }
@@ -92,5 +88,46 @@ class AuthService {
     if (data.isNotEmpty) {
       await _firestore.collection('users').doc(uid).update(data);
     }
+  }
+
+  /// Update user email with reauthentication
+  Future<void> updateEmail(String newEmail, String currentPassword) async {
+    final user = _auth.currentUser;
+    if (user == null) throw fb_auth.FirebaseAuthException(code: 'no-user', message: 'User not signed in.');
+
+    // Reauthenticate
+    final cred = fb_auth.EmailAuthProvider.credential(
+      email: user.email!,
+      password: currentPassword,
+    );
+    await user.reauthenticateWithCredential(cred);
+
+    // Update email
+    await user.updateEmail(newEmail);
+    await user.sendEmailVerification();
+  }
+
+  /// Update user password; requires recent login
+  Future<void> updatePassword(String newPassword, String currentPassword) async {
+    final user = _auth.currentUser;
+    if (user == null) throw fb_auth.FirebaseAuthException(code: 'no-user', message: 'User not signed in.');
+
+    // Reauthenticate
+    final cred = fb_auth.EmailAuthProvider.credential(
+      email: user.email!,
+      password: currentPassword,
+    );
+    await user.reauthenticateWithCredential(cred);
+
+    // Update password
+    await user.updatePassword(newPassword);
+  }
+
+  /// Delete user account entirely (Auth only)
+  Future<void> deleteAccount() async {
+    final user = _auth.currentUser;
+    if (user == null) throw fb_auth.FirebaseAuthException(code: 'no-user', message: 'User not signed in.');
+
+    await user.delete();
   }
 }

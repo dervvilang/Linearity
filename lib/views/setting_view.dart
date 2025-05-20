@@ -64,7 +64,9 @@ class SettingView extends StatelessWidget {
                 children: [
                   SettingCard(
                     title: loc.editProfile,
-                    onTap: () {/* TODO: переход на EditProfileView */},
+                    onTap: () {
+                      Navigator.of(context).pushNamed('/editProfile');
+                    },
                     backColor: colors.ratingCard,
                     icon: SvgPicture.asset(
                       'lib/assets/icons/arrow_right_simple.svg',

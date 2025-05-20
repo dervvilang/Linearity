@@ -190,5 +190,49 @@
   "languageLabel": "Язык:",
   "@languageLabel": {
     "description": "Подпись переключателя языка"
+  },
+  "editProfileTitle": "Редактировать профиль",
+  "@editProfileTitle": {
+    "description": "Заголовок экрана редактирования профиля пользователя"
+  },
+  "changeAvatar": "Изменить аватар",
+  "@changeAvatar": {
+    "description": "Надпись на кнопке для выбора новой аватарки"
+  },
+  "displayNameLabel": "Имя",
+  "@displayNameLabel": {
+    "description": "Метка для поля отображаемого имени пользователя"
+  },
+  "usernameLabel": "Никнейм",
+  "@usernameLabel": {
+    "description": "Метка для поля имени пользователя (никнейма)"
+  },
+  "fieldRequired": "Поле обязательно для заполнения",
+  "@fieldRequired": {
+    "description": "Сообщение валидации, когда обязательное поле пустое"
+  },
+  "invalidEmail": "Неверный формат почты",
+  "@invalidEmail": {
+    "description": "Сообщение валидации при некорректном формате email"
+  },
+  "passwordTooShort": "Пароль должен быть не менее 6 символов",
+  "@passwordTooShort": {
+    "description": "Сообщение валидации, когда пароль слишком короткий"
+  },
+  "saveChanges": "Сохранить",
+  "@saveChanges": {
+    "description": "Надпись на кнопке сохранения изменений профиля"
+  },
+  "profileUpdated": "Профиль обновлён",
+  "@profileUpdated": {
+    "description": "Сообщение Snackbar после успешного обновления профиля"
+  },
+  "deleteAccountConfirm": "Вы действительно хотите удалить аккаунт? Это действие невозможно отменить.",
+  "@deleteAccountConfirm": {
+    "description": "Сообщение-подтверждение перед удалением аккаунта"
+  },
+  "cancel": "Отмена",
+  "@cancel": {
+    "description": "Надпись на кнопке отмены в диалогах"
   }
 }
