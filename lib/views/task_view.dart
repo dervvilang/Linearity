@@ -95,18 +95,17 @@ class _TaskViewState extends State<TaskView> {
     }
     if (vm.hasError) {
       return Scaffold(
-        body: Center(child: Text('todo')),
+        body: Center(child: Text(loc.taskError)),
       );
     }
     final task = vm.currentTask;
     if (task == null) {
       return Scaffold(
         appBar: AppBar(title: Text(_getTitle(context))),
-        body: Center(child: Text('todo')),
+        body: Center(child: Text(loc.taskError)),
       );
     }
 
-    // Кнопка подсказки (TODO позже)
     final hintButton = TaskActionButton(
       icon: SvgPicture.asset(
         'lib/assets/icons/hint.svg',
@@ -209,7 +208,7 @@ class _TaskViewState extends State<TaskView> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Text(
-                            '${loc.task}: ${_getTaskSubtitle(loc, task!)}',
+                            '${loc.task}: ${_getTaskSubtitle(loc, task)}',
                             style: theme.textTheme.bodyLarge,
                           ),
                         ),

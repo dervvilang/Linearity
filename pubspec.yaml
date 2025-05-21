@@ -44,8 +44,15 @@ flutter:
   assets:
     - lib/assets/icons/
     - lib/assets/icons/avatar_1.svg
-    - lib/assets/icons/avatar_f2.svg
     - lib/assets/icons/avatar_2.svg
+    - lib/assets/icons/avatar_3.svg
+    - lib/assets/icons/avatar_4.svg
+    - lib/assets/icons/avatar_5.svg
+    - lib/assets/icons/avatar_6.svg
+    - lib/assets/icons/avatar_7.svg
+    - lib/assets/icons/avatar_8.svg
+    - lib/assets/icons/avatar_9.svg
+    - lib/assets/icons/avatar_f2.svg
     - lib/assets/icons/arrow_left.svg
     - lib/assets/icons/arrow_right_simple.svg
     - lib/assets/icons/coin.svg

@@ -11,13 +11,13 @@ class UserInRank extends StatelessWidget {
   final bool isOnBlueBackground;
 
   const UserInRank({
-    Key? key,
+    super.key,
     required this.username,
     required this.avatarAsset,
     required this.score,
     required this.rank,
     this.isOnBlueBackground = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

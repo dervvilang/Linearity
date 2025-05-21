@@ -66,7 +66,10 @@ class _LoginViewState extends State<LoginView> {
     final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Вход')),
+      appBar: AppBar(
+        title: Text(loc.signIn),
+        automaticallyImplyLeading: false,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -91,7 +94,7 @@ class _LoginViewState extends State<LoginView> {
                 TextFormField(
                   controller: _passwordCtrl,
                   decoration: InputDecoration(
-                    labelText: 'Пароль',
+                    labelText: loc.passwordLabel,
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscure ? Icons.visibility : Icons.visibility_off,

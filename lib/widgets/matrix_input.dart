@@ -29,7 +29,6 @@ class MatrixInput extends StatefulWidget {
 
 class MatrixInputState extends State<MatrixInput> {
   late final List<List<TextEditingController>> _controllers;
-  bool get mounted => super.mounted;
 
   @override
   void initState() {
@@ -43,7 +42,9 @@ class MatrixInputState extends State<MatrixInput> {
   @override
   void dispose() {
     for (final row in _controllers) {
-      for (final c in row) c.dispose();
+      for (final c in row) {
+        c.dispose();
+      }
     }
     super.dispose();
   }

@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'dart:ui' show FontFeature;
 
 /// Виджет для отображения матрицы с круглыми скобками
 /// и фиксированной шириной колонок под значения от -99.9 до +99.9.
 class MatrixDisplay extends StatelessWidget {
   final List<List<num>> matrix;
 
-  const MatrixDisplay({Key? key, required this.matrix}) : super(key: key);
+  const MatrixDisplay({super.key, required this.matrix});
 
   @override
   Widget build(BuildContext context) {

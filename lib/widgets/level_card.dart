@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LevelCard extends StatelessWidget {
   final int levelNumber;
@@ -14,7 +15,7 @@ class LevelCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Текущая тема
+    final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     return Material(
       color: Colors.transparent,
@@ -32,7 +33,7 @@ class LevelCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(14), // Скругление углов.
           ),
           child: Text(
-            'Уровень $levelNumber',
+            '${loc.levelsTitle} $levelNumber',
             style: theme.textTheme.bodyLarge,
           ),
         ),

@@ -6,9 +6,16 @@ class AvatarPickerDialog extends StatelessWidget {
   static const _avatars = [
     'lib/assets/icons/avatar_1.svg',
     'lib/assets/icons/avatar_2.svg',
+    'lib/assets/icons/avatar_3.svg',
+    'lib/assets/icons/avatar_4.svg',
+    'lib/assets/icons/avatar_5.svg',
+    'lib/assets/icons/avatar_6.svg',
+    'lib/assets/icons/avatar_7.svg',
+    'lib/assets/icons/avatar_8.svg',
+    'lib/assets/icons/avatar_9.svg',
   ];
 
-  const AvatarPickerDialog({Key? key}) : super(key: key);
+  const AvatarPickerDialog({super.key});
 
   @override
   Widget build(BuildContext context) {

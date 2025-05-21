@@ -1,6 +1,7 @@
 // lib/widgets/editable_about_me_card.dart
 
 import 'package:flutter/material.dart';
+import 'package:linearity/themes/additional_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:linearity/view_models/auth_vm.dart';
@@ -72,6 +73,8 @@ class _EditableAboutMeCardState extends State<EditableAboutMeCard> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final colors = theme.extension<AdditionalColors>()!;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -104,7 +107,7 @@ class _EditableAboutMeCardState extends State<EditableAboutMeCard> {
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
                       child: Text(
                         savedText.isEmpty ? '${loc.profileAbout}:' : savedText,
-                        style: const TextStyle(fontSize: 16),
+                        style: const TextStyle(fontSize: 18),
                       ),
                     ),
                   ),

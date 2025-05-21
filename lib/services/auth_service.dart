@@ -98,8 +98,10 @@ class AuthService {
   /// Update user email with reauthentication
   Future<void> updateEmail(String newEmail, String currentPassword) async {
     final user = _auth.currentUser;
-    if (user == null) throw fb_auth.FirebaseAuthException(
+    if (user == null) {
+      throw fb_auth.FirebaseAuthException(
       code: 'no-user', message: 'User not signed in.');
+    }
 
     final cred = fb_auth.EmailAuthProvider.credential(
       email: user.email!,
@@ -119,8 +121,10 @@ class AuthService {
   /// Update user password; requires recent login
   Future<void> updatePassword(String newPassword, String currentPassword) async {
     final user = _auth.currentUser;
-    if (user == null) throw fb_auth.FirebaseAuthException(
+    if (user == null) {
+      throw fb_auth.FirebaseAuthException(
       code: 'no-user', message: 'User not signed in.');
+    }
 
     final cred = fb_auth.EmailAuthProvider.credential(
       email: user.email!,
@@ -134,8 +138,10 @@ class AuthService {
   /// Delete user account entirely (Auth only)
   Future<void> deleteAccount() async {
     final user = _auth.currentUser;
-    if (user == null) throw fb_auth.FirebaseAuthException(
+    if (user == null) {
+      throw fb_auth.FirebaseAuthException(
       code: 'no-user', message: 'User not signed in.');
+    }
 
     await user.delete();
   }

@@ -8,7 +8,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../view_models/edit_profile_vm.dart';
 
 class EditProfileView extends StatefulWidget {
-  const EditProfileView({Key? key}) : super(key: key);
+  const EditProfileView({super.key});
 
   @override
   State<EditProfileView> createState() => _EditProfileViewState();
@@ -24,7 +24,7 @@ class _EditProfileViewState extends State<EditProfileView> {
     final theme = Theme.of(context);
     final colors = theme.extension<AdditionalColors>()!;
 
-    Widget _buildAvatar() {
+    Widget buildAvatar() {
       return CircleAvatar(
         radius: 75,
         backgroundColor: Colors.transparent,
@@ -36,7 +36,7 @@ class _EditProfileViewState extends State<EditProfileView> {
       );
     }
 
-    void _showAvatarPicker() {
+    void showAvatarPicker() {
       showModalBottomSheet<String>(
         context: context,
         builder: (_) => Padding(
@@ -115,14 +115,14 @@ class _EditProfileViewState extends State<EditProfileView> {
                           // Аватар
                           Center(
                             child: GestureDetector(
-                              onTap: _showAvatarPicker,
-                              child: _buildAvatar(),
+                              onTap: showAvatarPicker,
+                              child: buildAvatar(),
                             ),
                           ),
                           const SizedBox(height: 12),
                           Center(
                             child: TextButton(
-                              onPressed: _showAvatarPicker,
+                              onPressed: showAvatarPicker,
                               child: Text(
                                 loc.changeAvatar,
                                 style: const TextStyle(fontSize: 18),

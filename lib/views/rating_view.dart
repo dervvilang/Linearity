@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import 'package:linearity/models/user.dart' as linearity_user;
 import 'package:linearity/themes/additional_colors.dart';
 import 'package:linearity/services/firestore_service.dart';
 import 'package:linearity/view_models/rating_vm.dart';

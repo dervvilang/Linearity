@@ -73,23 +73,17 @@
     "@addMatrixTask": {
         "description": "Name of the task category related to matrix addition and subtraction"
     },
-    "detMatrixTask": "Determinant and eigenvalue computation",
+    "detMatrixTask": "Search for a determinant",
     "@detMatrixTask": {
-        "description": "Name of the task category related to computing determinants and eigenvalues"
+        "description": "Name of the task category related to computing determinants"
     },
     "multMatrixTask": "Matrix multiplication",
     "@multMatrixTask": {
         "description": "The name of the category of tasks related to matrix multiplication"
     },
-    "levelsTitle": "Level {levelNumber}",
+    "levelsTitle": "Level",
     "@levelsTitle": {
-        "description": "Title of a level in the list (e.g., 'Level 1')",
-        "placeholders": {
-            "levelNumber": {
-                "example": "1",
-                "type": "String"
-            }
-        }
+        "description": "Title of a level in the list (e.g., 'Level 1')"
     },
     "ratingTitle": "Player Ratings",
     "@ratingTitle": {
@@ -187,7 +181,7 @@
     "@closeApp": {
         "description": "Menu option for exiting the application"
     },
-    "languageLabel": "Language:",
+    "languageLabel": "Language English/Russian",
     "@languageLabel": {
         "description": "Label for the language switcher"
     },
@@ -282,5 +276,17 @@
   "haveAc": "Already have an account? Sign in",
   "@haveAc": {
     "description": "Уже есть аккаунт? Войти"
+  },
+  "signIn": "Sign in",
+  "@signIn": {
+    "description": "Sign in"
+  },
+  "taskError": "Issue loading error",
+  "@taskError": {
+    "description": "Issue loading error"
+  },
+  "loadError": "Loading error:",
+  "@loadError": {
+    "description": "Loading error:"
   }
 }

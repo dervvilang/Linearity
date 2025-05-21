@@ -48,7 +48,7 @@ class _LevelsListViewState extends State<LevelsListView> {
         // 2) Если ошибка — сообщение
         if (snapshot.hasError) {
           return Scaffold(
-            body: Center(child: Text('Ошибка загрузки: ${snapshot.error}')),
+            body: Center(child: Text('${loc.loadError} ${snapshot.error}')),
           );
         }
         // 3) Успех — получили число уровней

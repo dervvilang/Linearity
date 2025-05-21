@@ -73,7 +73,7 @@
   "@addMatrixTask": {
     "description": "Название категории задач, связанных с сложением/вычитанием матриц"
   },
-  "detMatrixTask": "Поиск определителя, собственных значений",
+  "detMatrixTask": "Поиск определителя",
   "@detMatrixTask": {
     "description": "Название категории задач, связанных с нахождением определителя"
   },
@@ -81,15 +81,9 @@
   "@multMatrixTask": {
     "description": "Название категории задач, связанных с умножение матриц"
   },
-  "levelsTitle": "Уровень {levelNumber}",
+  "levelsTitle": "Уровень",
   "@levelsTitle": {
-    "description": "Название уровня в списке (например, 'Уровень 1')",
-    "placeholders": {
-      "levelNumber": {
-        "example": "1",
-        "type": "String"
-      }
-    }
+    "description": "Название уровня в списке (например, 'Уровень 1')"
   },
   "ratingTitle": "Рейтинг игроков",
   "@ratingTitle": {
@@ -187,7 +181,7 @@
   "@closeApp": {
     "description": "Пункт меню для выхода из приложения"
   },
-  "languageLabel": "Язык:",
+  "languageLabel": "Язык английский/русский",
   "@languageLabel": {
     "description": "Подпись переключателя языка"
   },
@@ -282,5 +276,17 @@
   "haveAc": "Уже есть аккаунт? Войти",
   "@haveAc": {
     "description": "Уже есть аккаунт? Войти"
+  },
+  "signIn": "Вход",
+  "@signIn": {
+    "description": "Вход"
+  },
+  "taskError": "Ошибка загрузки задач",
+  "@taskError": {
+    "description": "Ошибка загрузки задач"
+  },
+  "loadError": "Ошибка загрузки:",
+  "@loadError": {
+    "description": "Ошибка загрузки:"
   }
 }

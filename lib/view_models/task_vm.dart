@@ -1,7 +1,6 @@
 // lib/view_models/task_vm.dart
 
 import 'package:flutter/foundation.dart';
-import 'package:collection/collection.dart';
 import 'package:linearity/services/firestore_service.dart';
 import 'package:linearity/models/matrix_task.dart';
 
@@ -39,7 +38,7 @@ class TaskViewModel extends ChangeNotifier {
       currentIndex = 0;
       answeredCorrectly = false;
       cellCorrectness = [];
-    } catch (e, st) {
+    } catch (e) {
       hasError = true;
     }
 

@@ -16,7 +16,7 @@ class MatrixTask {
   final String pattern;
   final List<List<num>> matrixA;
   final List<List<num>>? matrixB;
-  final List<List<num>> answer; // теперь для детерминанта — 1×1
+  final List<List<num>> answer;
 
   MatrixTask({
     required this.id,

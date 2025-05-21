@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import '../services/auth_service.dart';
-import '../services/firestore_service.dart';           // если нужен для удаления
+import '../services/firestore_service.dart'; // если нужен для удаления
 import '../view_models/auth_vm.dart';
 
 class EditProfileViewModel extends ChangeNotifier {
@@ -15,7 +15,13 @@ class EditProfileViewModel extends ChangeNotifier {
   final List<String> availableAvatars = [
     'lib/assets/icons/avatar_1.svg',
     'lib/assets/icons/avatar_2.svg',
-    // при необходимости добавьте ещё
+    'lib/assets/icons/avatar_3.svg',
+    'lib/assets/icons/avatar_4.svg',
+    'lib/assets/icons/avatar_5.svg',
+    'lib/assets/icons/avatar_6.svg',
+    'lib/assets/icons/avatar_7.svg',
+    'lib/assets/icons/avatar_8.svg',
+    'lib/assets/icons/avatar_9.svg',
   ];
 
   // Оригинальные значения для сравнения
@@ -34,7 +40,8 @@ class EditProfileViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   /// Конструктор, подтягивает текущие данные из AuthViewModel
-  EditProfileViewModel(BuildContext context, {
+  EditProfileViewModel(
+    BuildContext context, {
     AuthService? authService,
     FirestoreService? firestoreService,
   })  : _authService = authService ?? AuthService(),
@@ -51,7 +58,8 @@ class EditProfileViewModel extends ChangeNotifier {
     final avatarChanged = avatarAsset != _origAvatarAsset;
     final usernameChanged = username != _origUsername;
     final emailChanged = email != _origEmail && currentPassword.isNotEmpty;
-    final passwordChanged = newPassword.isNotEmpty && currentPassword.isNotEmpty;
+    final passwordChanged =
+        newPassword.isNotEmpty && currentPassword.isNotEmpty;
     return avatarChanged || usernameChanged || emailChanged || passwordChanged;
   }
 
