@@ -43,9 +43,7 @@ class FirestoreService {
         .collection('level$level')
         .get();
 
-    return snap.docs
-        .map((d) => MatrixTask.fromJson(d.id, d.data()))
-        .toList();
+    return snap.docs.map((d) => MatrixTask.fromJson(d.id, d.data())).toList();
   }
 
   /// Выбирает случайные [count] задач из переданного списка.
@@ -89,10 +87,8 @@ class FirestoreService {
 
   /// Пересчитывает ранги всех пользователей и записывает их в поле `rank`.
   Future<void> _recalculateRanks() async {
-    final snap = await _db
-        .collection('users')
-        .orderBy('score', descending: true)
-        .get();
+    final snap =
+        await _db.collection('users').orderBy('score', descending: true).get();
 
     final batch = _db.batch();
     for (var i = 0; i < snap.docs.length; i++) {
@@ -123,6 +119,12 @@ class FirestoreService {
     Map<String, dynamic> data,
   ) async {
     await _db.collection('users').doc(uid).update(data);
+  }
+
+  Future<AppUser?> getUserById(String uid) async {
+    final snap = await _db.collection('users').doc(uid).get();
+    if (!snap.exists) return null;
+    return AppUser.fromJson(snap.data()!..['id'] = uid);
   }
 
   /// Удаляет документ пользователя [uid].

@@ -4,7 +4,7 @@ class AppUser {
   final String id;
   final String email;
   final String username;
-  final String avatarAsset; 
+  final String avatarAsset;
   final String description;
   final int score;
   final int rank;
@@ -46,6 +46,11 @@ class AppUser {
     };
   }
 
+  /// Создаёт AppUser из JSON-данных (алиас для fromMap).
+  factory AppUser.fromJson(Map<String, dynamic> json) {
+    return AppUser.fromMap(json);
+  }
+
   /// Возвращает копию AppUser с обновлёнными полями.
   AppUser copyWith({
     String? username,
@@ -53,7 +58,6 @@ class AppUser {
     String? description,
     int? score,
     int? rank,
-    String? userTheme,
   }) {
     return AppUser(
       id: id,

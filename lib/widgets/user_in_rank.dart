@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:linearity/themes/additional_colors.dart';
+import 'package:linearity/views/public_profile_view.dart';
 
+/// Виджет одной строки в рейтинге. При тапе переходит на публичный профиль пользователя.
 class UserInRank extends StatelessWidget {
+  /// Идентификатор пользователя для перехода на его страницу.
+  final String uid;
   final String username;
   final String avatarAsset;
   final int score;
@@ -12,6 +16,7 @@ class UserInRank extends StatelessWidget {
 
   const UserInRank({
     super.key,
+    required this.uid,
     required this.username,
     required this.avatarAsset,
     required this.score,
@@ -29,66 +34,78 @@ class UserInRank extends StatelessWidget {
     final rankTextColor =
         isOnBlueBackground ? colors.text : colors.greetingText;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            rankString,
-            style: theme.textTheme.headlineMedium?.copyWith(
-              color: rankTextColor,
-            ),
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => PublicProfileView(uid: uid),
           ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(22),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              rankString,
+              style: theme.textTheme.headlineMedium?.copyWith(
+                color: rankTextColor,
               ),
-              margin: EdgeInsets.zero,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 24,
-                      backgroundColor: Colors.transparent,
-                      child: ClipOval(
-                        child: SvgPicture.asset(
-                          avatarAsset,
-                          width: 48,
-                          height: 48,
-                          fit: BoxFit.cover,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(22),
+                ),
+                margin: EdgeInsets.zero,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundColor: Colors.transparent,
+                        child: ClipOval(
+                          child: SvgPicture.asset(
+                            avatarAsset,
+                            width: 48,
+                            height: 48,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            username,
-                            style: theme.textTheme.headlineSmall,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            '$score ${loc.pointsLabel(score)}',
-                            style: theme.textTheme.bodySmall,
-                          ),
-                        ],
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              username,
+                              style: theme.textTheme.headlineSmall,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              '$score ${loc.pointsLabel(score)}',
+                              style: theme.textTheme.bodySmall,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

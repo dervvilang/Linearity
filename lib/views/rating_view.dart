@@ -84,56 +84,60 @@ class _RatingViewBodyState extends State<_RatingViewBody> {
           ),
         ),
         body: vm.isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : vm.hasError
-                ? Center(child: Text('Ошибка загрузки рейтинга',
-                    style: theme.textTheme.bodyLarge))
-                : Column(
-                    children: [
-                      // Топ-3
-                      Container(
-                        width: double.infinity,
-                        height: 85 * 3.0,
-                        decoration: BoxDecoration(
-                          color: colors.secback,
-                          borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(20),
-                            bottomRight: Radius.circular(20),
-                          ),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: vm.users
-                              .take(3)
-                              .map((u) => UserInRank(
-                                    rank: u.rank,
-                                    username: u.username,
-                                    avatarAsset: u.avatarAsset,
-                                    score: u.score,
-                                    isOnBlueBackground: true,
-                                  ))
-                              .toList(),
-                        ),
-                      ),
-
-                      // Остальные
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount:
-                              vm.users.length > 3 ? vm.users.length - 3 : 0,
-                          itemBuilder: (_, i) {
-                            final u = vm.users[i + 3];
-                            return UserInRank(
-                              rank: u.rank,
-                              username: u.username,
-                              avatarAsset: u.avatarAsset,
-                              score: u.score,
-                            );
-                          },
-                        ),
-                      ),
-                    ],
+          ? const Center(child: CircularProgressIndicator())
+          : vm.hasError
+              ? Center(
+                  child: Text(
+                    loc.loadError,
+                    style: theme.textTheme.bodyLarge,
                   ),
+                )
+              : Column(
+                  children: [
+                    // Топ-3
+                    Container(
+                      width: double.infinity,
+                      height: 85 * 3.0,
+                      decoration: BoxDecoration(
+                        color: colors.secback,
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(20),
+                          bottomRight: Radius.circular(20),
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: vm.users.take(3).map((u) {
+                          return UserInRank(
+                            uid: u.id,
+                            rank: u.rank,
+                            username: u.username,
+                            avatarAsset: u.avatarAsset,
+                            score: u.score,
+                            isOnBlueBackground: true,
+                          );
+                        }).toList(),
+                      ),
+                    ),
+
+                    // Остальные
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: vm.users.length > 3 ? vm.users.length - 3 : 0,
+                        itemBuilder: (_, i) {
+                          final u = vm.users[i + 3];
+                          return UserInRank(
+                            uid: u.id,
+                            rank: u.rank,
+                            username: u.username,
+                            avatarAsset: u.avatarAsset,
+                            score: u.score,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
         bottomNavigationBar: SafeArea(
           child: BottomNavigationBar(
             currentIndex: 1,
