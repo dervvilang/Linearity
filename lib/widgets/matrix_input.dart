@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:linearity/themes/additional_colors.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MatrixInput extends StatefulWidget {
   final int rows;
@@ -67,10 +68,10 @@ class MatrixInputState extends State<MatrixInput> {
     }
   }
 
-  /* ——— UI ——— */
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colors = theme.extension<AdditionalColors>()!;
 
@@ -83,7 +84,7 @@ class MatrixInputState extends State<MatrixInput> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Ответ:',
+          Text(loc.answer,
               style: theme.textTheme.titleMedium!
                   .copyWith(fontWeight: FontWeight.bold, color: colors.text)),
           const SizedBox(height: 8),
@@ -101,7 +102,7 @@ class MatrixInputState extends State<MatrixInput> {
                       children: List.generate(widget.columns, (j) {
                         final ok = widget.cellCorrectness?[i][j];
                         final txt = ok == null
-                            ? colors.text
+                            ? colors.text2
                             : (ok ? Colors.green : Colors.red);
 
                         return Padding(

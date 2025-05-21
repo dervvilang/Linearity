@@ -22,10 +22,12 @@ class AdditionalColors extends ThemeExtension<AdditionalColors> {
   final Color greetingText;
   final Color ratingCard;
   final Color fifth;
+  final Color text2;
 
   const AdditionalColors({
     required this.scaffold,
     required this.text,
+    required this.text2,
     required this.primary,
     required this.secondary,
     required this.tertiary,
@@ -48,6 +50,7 @@ class AdditionalColors extends ThemeExtension<AdditionalColors> {
   AdditionalColors copyWith({
     Color? scaffold,
     Color? text,
+    Color? text2,
     Color? primary,
     Color? secondary,
     Color? tertiary,
@@ -68,6 +71,7 @@ class AdditionalColors extends ThemeExtension<AdditionalColors> {
     return AdditionalColors(
       scaffold: scaffold ?? this.scaffold,
       text: text ?? this.text,
+      text2: text2 ?? this.text2,
       primary: primary ?? this.primary,
       secondary: secondary ?? this.secondary,
       tertiary: tertiary ?? this.tertiary,
@@ -93,6 +97,7 @@ class AdditionalColors extends ThemeExtension<AdditionalColors> {
     return AdditionalColors(
       scaffold: Color.lerp(scaffold, other.scaffold, t)!,
       text: Color.lerp(text, other.text, t)!,
+      text2: Color.lerp(text2, other.text2, t)!,
       primary: Color.lerp(primary, other.primary, t)!,
       secondary: Color.lerp(secondary, other.secondary, t)!,
       tertiary: Color.lerp(tertiary, other.tertiary, t)!,

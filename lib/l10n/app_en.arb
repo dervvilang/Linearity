@@ -254,5 +254,33 @@
   "taskInverse": "Find the inverse of the matrix",
   "@taskInverse": {
     "description": "Task description: compute the inverse matrix"
+  },
+  "enterEmail": "Enter email",
+  "@enterEmail": {
+    "description": "Введите email"
+  },
+  "moreSix": "At least 6 characters",
+  "@moreSix": {
+    "description": "Не менее 6 символов"
+  },
+  "register": "Don't have an account? Register",
+  "@register": {
+    "description": "Нет аккаунта? Зарегистрироваться"
+  },
+  "registration": "Registration",
+  "@registration": {
+    "description": "Регистрация"
+  },
+  "registration2": "Sign up",
+  "@registration2": {
+    "description": "Зарегистрироваться"
+  },
+  "enterName": "Enter name",
+  "@enterName": {
+    "description": "Введите имя"
+  },
+  "haveAc": "Already have an account? Sign in",
+  "@haveAc": {
+    "description": "Уже есть аккаунт? Войти"
   }
 }

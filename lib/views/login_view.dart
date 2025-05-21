@@ -1,3 +1,5 @@
+// lib/views/login_view.dart
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -5,6 +7,7 @@ import 'package:linearity/view_models/auth_vm.dart';
 import 'package:linearity/themes/additional_colors.dart';
 import 'package:linearity/views/register_view.dart';
 import 'package:linearity/views/home_view.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -34,7 +37,21 @@ class _LoginViewState extends State<LoginView> {
       password: _passwordCtrl.text,
     );
     if (!mounted) return;
-    if (auth.error == null && auth.user != null) {
+
+    // Если есть ошибка — показываем SnackBar и сбрасываем её
+    if (auth.error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(auth.error!),
+          backgroundColor: Colors.red,
+        ),
+      );
+      auth.clearError();
+      return;
+    }
+
+    // При успешном входе — переходим на HomeView
+    if (auth.user != null) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const HomeView()),
       );
@@ -46,6 +63,7 @@ class _LoginViewState extends State<LoginView> {
     final auth = context.watch<AuthViewModel>();
     final theme = Theme.of(context);
     final colors = theme.extension<AdditionalColors>()!;
+    final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Вход')),
@@ -64,10 +82,10 @@ class _LoginViewState extends State<LoginView> {
                 const SizedBox(height: 32),
                 TextFormField(
                   controller: _emailCtrl,
-                  decoration: const InputDecoration(labelText: 'E-mail'),
+                  decoration: InputDecoration(labelText: loc.emailLabel),
                   keyboardType: TextInputType.emailAddress,
                   validator: (v) =>
-                      v != null && v.contains('@') ? null : 'Введите email',
+                      v != null && v.contains('@') ? null : loc.enterEmail,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -83,13 +101,9 @@ class _LoginViewState extends State<LoginView> {
                   ),
                   obscureText: _obscure,
                   validator: (v) =>
-                      v != null && v.length >= 6 ? null : 'Не менее 6 символов',
+                      v != null && v.length >= 6 ? null : loc.moreSix,
                 ),
                 const SizedBox(height: 24),
-                if (auth.error != null) ...[
-                  Text(auth.error!, style: const TextStyle(color: Colors.red)),
-                  const SizedBox(height: 12),
-                ],
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -103,7 +117,7 @@ class _LoginViewState extends State<LoginView> {
                               color: Colors.white,
                             ),
                           )
-                        : const Text('Войти'),
+                        : Text(loc.loginButton),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -117,7 +131,7 @@ class _LoginViewState extends State<LoginView> {
                                 builder: (_) => const RegisterView()),
                           );
                         },
-                  child: const Text('Нет аккаунта? Зарегистрироваться'),
+                  child: Text(loc.register),
                 ),
               ],
             ),

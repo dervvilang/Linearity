@@ -1,3 +1,5 @@
+// lib/views/register_view.dart
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -5,6 +7,7 @@ import 'package:linearity/view_models/auth_vm.dart';
 import 'package:linearity/themes/additional_colors.dart';
 import 'package:linearity/views/login_view.dart';
 import 'package:linearity/views/home_view.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -37,7 +40,19 @@ class _RegisterViewState extends State<RegisterView> {
       password: _passwordCtrl.text,
     );
     if (!mounted) return;
-    if (auth.error == null && auth.user != null) {
+
+    if (auth.error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(auth.error!),
+          backgroundColor: Colors.red,
+        ),
+      );
+      auth.clearError();
+      return;
+    }
+
+    if (auth.user != null) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const HomeView()),
@@ -50,9 +65,13 @@ class _RegisterViewState extends State<RegisterView> {
     final auth = context.watch<AuthViewModel>();
     final theme = Theme.of(context);
     final colors = theme.extension<AdditionalColors>()!;
+    final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Регистрация')),
+      appBar: AppBar(
+        title: Text(loc.registration),
+        automaticallyImplyLeading: false,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -64,10 +83,9 @@ class _RegisterViewState extends State<RegisterView> {
                 const SizedBox(height: 32),
                 TextFormField(
                   controller: _usernameCtrl,
-                  decoration:
-                      const InputDecoration(labelText: 'Имя пользователя'),
+                  decoration: InputDecoration(labelText: loc.displayNameLabel),
                   validator: (v) =>
-                      v != null && v.isNotEmpty ? null : 'Введите имя',
+                      v != null && v.isNotEmpty ? null : loc.enterName,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -75,13 +93,13 @@ class _RegisterViewState extends State<RegisterView> {
                   decoration: const InputDecoration(labelText: 'E-mail'),
                   keyboardType: TextInputType.emailAddress,
                   validator: (v) =>
-                      v != null && v.contains('@') ? null : 'Введите email',
+                      v != null && v.contains('@') ? null : loc.enterEmail,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _passwordCtrl,
                   decoration: InputDecoration(
-                    labelText: 'Пароль',
+                    labelText: loc.passwordLabel,
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscure ? Icons.visibility : Icons.visibility_off,
@@ -91,13 +109,9 @@ class _RegisterViewState extends State<RegisterView> {
                   ),
                   obscureText: _obscure,
                   validator: (v) =>
-                      v != null && v.length >= 6 ? null : 'Не менее 6 символов',
+                      v != null && v.length >= 6 ? null : loc.moreSix,
                 ),
                 const SizedBox(height: 24),
-                if (auth.error != null) ...[
-                  Text(auth.error!, style: const TextStyle(color: Colors.red)),
-                  const SizedBox(height: 12),
-                ],
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -111,7 +125,7 @@ class _RegisterViewState extends State<RegisterView> {
                               color: Colors.white,
                             ),
                           )
-                        : const Text('Зарегистрироваться'),
+                        : Text(loc.registration2),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -125,7 +139,7 @@ class _RegisterViewState extends State<RegisterView> {
                                 builder: (_) => const LoginView()),
                           );
                         },
-                  child: const Text('Уже есть аккаунт? Войти'),
+                  child: Text(loc.haveAc),
                 ),
               ],
             ),

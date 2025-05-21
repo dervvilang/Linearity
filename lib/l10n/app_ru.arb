@@ -103,7 +103,7 @@
   "@taskSubtitle": {
     "description": "Описание задачи: перемножение матрицы"
   },
-  "answer": "Ответ",
+  "answer": "Ответ:",
   "@answer": {
     "description": "Заголовок поля для ввода ответа"
   },
@@ -254,5 +254,33 @@
   "taskInverse": "Найти обратную матрицу",
   "@taskInverse": {
     "description": "Описание задания: вычислить обратную матрицу"
+  },
+  "enterEmail": "Введите email",
+  "@enterEmail": {
+    "description": "Введите email"
+  },
+  "moreSix": "Не менее 6 символов",
+  "@moreSix": {
+    "description": "Не менее 6 символов"
+  },
+  "register": "Нет аккаунта? Зарегистрироваться",
+  "@register": {
+    "description": "Нет аккаунта? Зарегистрироваться"
+  },
+  "registration": "Регистрация",
+  "@registration": {
+    "description": "Регистрация"
+  },
+  "registration2": "Зарегистрироваться",
+  "@registration2": {
+    "description": "Зарегистрироваться"
+  },
+  "enterName": "Введите имя",
+  "@enterName": {
+    "description": "Введите имя"
+  },
+  "haveAc": "Уже есть аккаунт? Войти",
+  "@haveAc": {
+    "description": "Уже есть аккаунт? Войти"
   }
 }

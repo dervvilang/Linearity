@@ -90,14 +90,10 @@ class _HomeViewState extends State<HomeView> {
                     ),
                     // Аватар-иконка
                     GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const ProfileView(),
-                          ),
-                        );
-                      },
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const ProfileView()),
+                      ),
                       child: CircleAvatar(
                         radius: 24,
                         backgroundColor: Colors.transparent,

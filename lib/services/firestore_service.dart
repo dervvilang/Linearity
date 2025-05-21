@@ -1,3 +1,5 @@
+// lib/services/firestore_service.dart
+
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:linearity/models/user.dart';
@@ -17,12 +19,21 @@ class FirestoreService {
         : 0;
   }
 
+  /// Получает текст подсказки для заданной категории задач.
+  Future<String> fetchHint(String category) async {
+    final doc = await _db.collection('levels').doc(category).get();
+    if (!doc.exists) return 'Подсказка не найдена.';
+    final data = doc.data();
+    return (data != null && data['hint'] is String)
+        ? data['hint'] as String
+        : 'Подсказка не найдена.';
+  }
+
   /// Загружает все задачи для [category] и [level].
   Future<List<MatrixTask>> fetchAllTasks({
     required String category,
     required int level,
   }) async {
-    // Формируем путь к подколлекции
     final path = 'levels/$category/level$level';
     print('Загружаю задачи из $path');
 
@@ -60,16 +71,51 @@ class FirestoreService {
     return pickRandomTasks(all, count);
   }
 
-  /// Увеличивает счёт пользователя [uid] на [delta] в Firestore.
+  /* ───────────── очки + ранги ───────────── */
+
+  /// Увеличивает счёт пользователя на [delta] и пересчитывает ранги.
   Future<void> updateUserScore({
     required String uid,
     required int delta,
-  }) {
-    return _db
-        .collection('users')
-        .doc(uid)
-        .update({'score': FieldValue.increment(delta)});
+  }) async {
+    // Шаг 1: увеличить счёт
+    await _db.collection('users').doc(uid).update({
+      'score': FieldValue.increment(delta),
+    });
+
+    // Шаг 2: пересчитать ранги для всех пользователей
+    await _recalculateRanks();
   }
+
+  /// Пересчитывает ранги всех пользователей и записывает их в поле `rank`.
+  Future<void> _recalculateRanks() async {
+    final snap = await _db
+        .collection('users')
+        .orderBy('score', descending: true)
+        .get();
+
+    final batch = _db.batch();
+    for (var i = 0; i < snap.docs.length; i++) {
+      final doc = snap.docs[i];
+      batch.update(doc.reference, {'rank': i + 1});
+    }
+    await batch.commit();
+  }
+
+  /// Читает пользователей с уже сохранёнными полями `rank` (Top-100 по умолчанию).
+  Future<List<AppUser>> fetchUsers({int limit = 100}) async {
+    final snap = await _db
+        .collection('users')
+        .orderBy('score', descending: true)
+        .limit(limit)
+        .get();
+
+    return snap.docs
+        .map((d) => AppUser.fromMap({...d.data(), 'id': d.id}))
+        .toList();
+  }
+
+  /* ───────────── профиль ───────────── */
 
   /// Обновляет профиль пользователя [uid] данными из [data].
   Future<void> updateUserProfile(
@@ -77,26 +123,6 @@ class FirestoreService {
     Map<String, dynamic> data,
   ) async {
     await _db.collection('users').doc(uid).update(data);
-  }
-
-  /// Получить всех пользователей, отсортированных по score (desc).
-  Future<List<AppUser>> fetchAllUsersByScore() async {
-    final snap = await _db
-        .collection('users')
-        .orderBy('score', descending: true)
-        .get();
-    return snap.docs.map((d) {
-      final data = d.data();
-      return AppUser(
-        id: d.id,
-        email: data['email'] as String? ?? '',
-        username: data['username'] as String? ?? '',
-        avatarAsset: data['avatarAsset'] as String? ?? '',
-        description: data['description'] as String? ?? '',
-        score: (data['score'] as num?)?.toInt() ?? 0,
-        rank: 0,
-      );
-    }).toList();
   }
 
   /// Удаляет документ пользователя [uid].

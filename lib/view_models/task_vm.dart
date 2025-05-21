@@ -1,6 +1,7 @@
 // lib/view_models/task_vm.dart
+
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:collection/collection.dart';
 import 'package:linearity/services/firestore_service.dart';
 import 'package:linearity/models/matrix_task.dart';
 
@@ -12,6 +13,11 @@ class TaskViewModel extends ChangeNotifier {
   int currentIndex = 0;
   bool isLoading = false;
   bool hasError = false;
+  List<List<bool>> cellCorrectness = [];
+  bool answeredCorrectly = false;
+
+  String? hintText;
+  bool isHintLoading = false;
 
   TaskViewModel(this._fs);
 
@@ -30,35 +36,47 @@ class TaskViewModel extends ChangeNotifier {
         level: level,
         count: count,
       );
-      print('✅ loaded ${tasks.length} tasks');
       currentIndex = 0;
+      answeredCorrectly = false;
+      cellCorrectness = [];
     } catch (e, st) {
       hasError = true;
-      print('❌ Error in loadTasks: $e\n$st');
     }
 
     isLoading = false;
     notifyListeners();
   }
 
-  bool submitAnswer(List<List<num>> userAnswer, String uid) {
-    if (currentIndex >= tasks.length || tasks.isEmpty)
-      return false; // Добавить проверку на пустоту
-    final correct = tasks[currentIndex].answer;
-    final ok = listEquals(userAnswer, correct);
+  /// Проверка ответа и обновление баллов
+  Future<void> submitAnswer(List<List<num>> userAnswer, String uid) async {
+    cellCorrectness = List.generate(
+      tasks[currentIndex].answer.length,
+      (i) => List.generate(
+        tasks[currentIndex].answer[i].length,
+        (j) => userAnswer[i][j] == tasks[currentIndex].answer[i][j],
+      ),
+    );
+    answeredCorrectly = cellCorrectness.every((row) => row.every((v) => v));
 
-    if (ok) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        // Обновлять после кадра
-        _fs.updateUserScore(uid: uid, delta: 10);
-        currentIndex++;
-        notifyListeners();
-      });
+    if (answeredCorrectly) {
+      await _fs.updateUserScore(uid: uid, delta: 3);
     }
-    return ok;
+    notifyListeners();
   }
 
-  bool get isComplete => currentIndex >= tasks.length;
+  /// Загрузка текста подсказки для текущей категории
+  Future<void> loadHint(String category) async {
+    isHintLoading = true;
+    notifyListeners();
+
+    hintText = await _fs.fetchHint(category);
+
+    isHintLoading = false;
+    notifyListeners();
+  }
+
   MatrixTask? get currentTask =>
-      currentIndex < tasks.length ? tasks[currentIndex] : null;
+      (currentIndex < tasks.length) ? tasks[currentIndex] : null;
+
+  bool get isComplete => answeredCorrectly;
 }

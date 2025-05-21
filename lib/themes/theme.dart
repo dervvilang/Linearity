@@ -107,6 +107,7 @@ final ThemeData lightTheme = ThemeData(
       secback: AppColors.primaryBlue,
       hint: AppColors.primaryBlue,
       fifth: AppColors.fifthBlue,
+      text2: Colors.black,
     ),
   ],
 );
@@ -215,6 +216,7 @@ final ThemeData darkTheme = ThemeData(
       secback: AppColors.secondPurple,
       hint: AppColors.goldDark,
       fifth: AppColors.fifthPurple,
+      text2: AppColors.textForDark,
     ),
   ],
 );

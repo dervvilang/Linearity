@@ -15,13 +15,18 @@ class AuthService {
   ///    чтобы при любом изменении профиля отдавать новое значение.
   Stream<AppUser?> get user {
     return _auth.authStateChanges().asyncExpand((fbUser) {
-      if (fbUser == null) return Stream.value(null);
+      if (fbUser == null) {
+        // При логауте возвращаем null и завершаем поток документа
+        return Stream.value(null);
+      }
+      // Слушаем документ пользователя в Firestore
       return _firestore
           .collection('users')
           .doc(fbUser.uid)
           .snapshots()
           .handleError((_) {})
-          .map((snap) => snap.exists ? AppUser.fromMap(snap.data()!) : null);
+          .map((snap) =>
+              snap.exists ? AppUser.fromMap({...snap.data()!, 'id': snap.id}) : null);
     });
   }
 
@@ -65,7 +70,7 @@ class AuthService {
     if (!doc.exists || doc.data() == null) {
       throw Exception('Профиль пользователя не найден');
     }
-    return AppUser.fromMap(doc.data()!);
+    return AppUser.fromMap({...doc.data()!, 'id': doc.id});
   }
 
   /// Выйти из аккаунта.
@@ -82,7 +87,7 @@ class AuthService {
     String? description,
   }) async {
     final data = <String, dynamic>{};
-    if (username != null)    data['username']    = username;
+    if (username != null) data['username'] = username;
     if (avatarAsset != null) data['avatarAsset'] = avatarAsset;
     if (description != null) data['description'] = description;
     if (data.isNotEmpty) {
