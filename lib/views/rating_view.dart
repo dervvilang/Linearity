@@ -1,49 +1,52 @@
+// lib/views/rating_view.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:linearity/models/user.dart' as linearity_user;
 import 'package:linearity/themes/additional_colors.dart';
+import 'package:linearity/services/firestore_service.dart';
+import 'package:linearity/view_models/rating_vm.dart';
+import 'package:linearity/widgets/user_in_rank.dart';
 import 'package:linearity/views/home_view.dart';
 import 'package:linearity/views/profile_view.dart';
-import 'package:linearity/widgets/user_in_rank.dart';
 
-class RatingView extends StatefulWidget {
+class RatingView extends StatelessWidget {
   const RatingView({super.key});
 
   @override
-  State<RatingView> createState() => _RatingViewState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) {
+        final vm = RatingViewModel(context.read<FirestoreService>());
+        vm.loadUsers();
+        return vm;
+      },
+      child: const _RatingViewBody(),
+    );
+  }
 }
 
-class _RatingViewState extends State<RatingView> {
-  DateTime? _lastPressed;
+class _RatingViewBody extends StatefulWidget {
+  const _RatingViewBody();
 
-  // Примерные данные — для реальных берём из Firestore/VM
-  final List<linearity_user.AppUser> sampleUsers = [
-    // Пример:
-    // linearity_user.AppUser(
-    //   id: '1',
-    //   email: 'a@b.com',
-    //   username: 'User1',
-    //   avatarAsset: 'assets/icons/avatars/avatar1.svg',
-    //   description: '',
-    //   score: 100,
-    //   rank: 1,
-    //   userTheme: 'light',
-    // ),
-  ];
+  @override
+  State<_RatingViewBody> createState() => _RatingViewBodyState();
+}
+
+class _RatingViewBodyState extends State<_RatingViewBody> {
+  DateTime? _lastPressed;
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
+    final loc    = AppLocalizations.of(context)!;
+    final theme  = Theme.of(context);
     final colors = theme.extension<AdditionalColors>()!;
-    const double fixedAreaHeight = 85 * 3;
+    final vm     = context.watch<RatingViewModel>();
 
-    final topUsers = sampleUsers.take(3).toList();
-    final bottomUsers = sampleUsers.skip(3).toList();
-
+    // обработка "двойного" Back-press
     return WillPopScope(
       onWillPop: () async {
         final now = DateTime.now();
@@ -75,56 +78,63 @@ class _RatingViewState extends State<RatingView> {
               padding: const EdgeInsets.only(bottom: 8),
               child: Text(
                 loc.ratingTitle,
-                style:
-                    theme.textTheme.headlineLarge?.copyWith(color: colors.text),
+                style: theme.textTheme.headlineLarge
+                    ?.copyWith(color: colors.text),
               ),
             ),
           ),
         ),
-        body: Column(
-          children: [
-            // Верхний блок: топ-3
-            Container(
-              width: double.infinity,
-              height: fixedAreaHeight,
-              decoration: BoxDecoration(
-                color: colors.secback,
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
-                ),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: topUsers.map((u) {
-                  return UserInRank(
-                    rank: u.rank,
-                    username: u.username,
-                    avatarAsset: u.avatarAsset,
-                    score: u.score,
-                    isOnBlueBackground: true,
-                  );
-                }).toList(),
-              ),
-            ),
+        body: vm.isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : vm.hasError
+                ? Center(child: Text('Ошибка загрузки рейтинга',
+                    style: theme.textTheme.bodyLarge))
+                : Column(
+                    children: [
+                      // Топ-3
+                      Container(
+                        width: double.infinity,
+                        height: 85 * 3.0,
+                        decoration: BoxDecoration(
+                          color: colors.secback,
+                          borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(20),
+                            bottomRight: Radius.circular(20),
+                          ),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: vm.users
+                              .take(3)
+                              .map((u) => UserInRank(
+                                    rank: u.rank,
+                                    username: u.username,
+                                    avatarAsset: u.avatarAsset,
+                                    score: u.score,
+                                    isOnBlueBackground: true,
+                                  ))
+                              .toList(),
+                        ),
+                      ),
 
-            // Список остальных
-            Expanded(
-              child: ListView.builder(
-                itemCount: bottomUsers.length,
-                itemBuilder: (_, i) {
-                  final u = bottomUsers[i];
-                  return UserInRank(
-                    rank: u.rank,
-                    username: u.username,
-                    avatarAsset: u.avatarAsset,
-                    score: u.score,
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+                      // Остальные
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount:
+                              vm.users.length > 3 ? vm.users.length - 3 : 0,
+                          itemBuilder: (_, i) {
+                            final u = vm.users[i + 3];
+                            return UserInRank(
+                              rank: u.rank,
+                              username: u.username,
+                              avatarAsset: u.avatarAsset,
+                              score: u.score,
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
         bottomNavigationBar: SafeArea(
           child: BottomNavigationBar(
             currentIndex: 1,
@@ -161,15 +171,11 @@ class _RatingViewState extends State<RatingView> {
             ],
             onTap: (index) {
               if (index == 0) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const HomeView()),
-                );
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const HomeView()));
               } else if (index == 2) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ProfileView()),
-                );
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const ProfileView()));
               }
             },
           ),

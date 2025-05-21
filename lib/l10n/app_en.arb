@@ -234,5 +234,25 @@
   "cancel": "Cancel",
   "@cancel": {
     "description": "Label for cancel button in dialogs"
+  },
+    "taskAddition": "Add the matrices",
+  "@taskAddition": {
+    "description": "Task description: addition of two matrices"
+  },
+  "taskSubtraction": "Subtract the second matrix from the first",
+  "@taskSubtraction": {
+    "description": "Task description: subtraction of matrices (A − B)"
+  },
+  "taskMultiplication": "Multiply the matrices",
+  "@taskMultiplication": {
+    "description": "Task description: multiplication of two matrices"
+  },
+  "taskDeterminant": "Find the determinant of the matrix",
+  "@taskDeterminant": {
+    "description": "Task description: compute the determinant"
+  },
+  "taskInverse": "Find the inverse of the matrix",
+  "@taskInverse": {
+    "description": "Task description: compute the inverse matrix"
   }
 }

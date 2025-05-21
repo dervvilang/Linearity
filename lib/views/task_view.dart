@@ -1,6 +1,10 @@
 // lib/views/task_view.dart
+//
+// Экран выполнения одной из трёх случайно-выбранных задач уровня.
+// Кнопка всегда "Проверить" до верного ответа, после — "Продолжить".
 
 import 'package:flutter/material.dart';
+import 'package:linearity/models/matrix_task.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -9,6 +13,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:linearity/models/task_type.dart';
 import 'package:linearity/themes/additional_colors.dart';
 import 'package:linearity/view_models/task_vm.dart';
+import 'package:linearity/services/firestore_service.dart';
 import 'package:linearity/widgets/matrix_display.dart';
 import 'package:linearity/widgets/matrix_input.dart';
 import 'package:linearity/widgets/task_action_button.dart';
@@ -31,66 +36,69 @@ class _TaskViewState extends State<TaskView> {
   late final TaskViewModel _vm;
   final _matrixKey = GlobalKey<MatrixInputState>();
 
-  /// true, когда последний ответ был правильным
   bool _answeredCorrectly = false;
-  /// матрица true/false по ячейкам
   List<List<bool>> _cellCorrectness = [];
 
   @override
   void initState() {
     super.initState();
     _vm = context.read<TaskViewModel>();
-    // грузим задачи сразу после первого кадра
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _vm.loadTasks(
         category: widget.taskType.firestoreCategory,
         level: widget.level,
-        count: 3,
+        count: 1,
       );
     });
   }
 
-  /// Проверяем ответ, подсвечиваем _cellCorrectness и ставим _answeredCorrectly
+  String _getTaskSubtitle(AppLocalizations loc, MatrixTask task) {
+    switch (task.type) {
+      case OperationType.addition:
+        return loc.taskAddition;
+      case OperationType.subtraction:
+        return loc.taskSubtraction;
+      case OperationType.multiplication:
+        return loc.taskMultiplication;
+      case OperationType.determinant:
+        return loc.taskDeterminant;
+      case OperationType.inverse:
+        return loc.taskInverse;
+    }
+  }
+
+  /// Проверка ответа
   void _onCheck() {
+    FocusScope.of(context).unfocus();
+
     final task = _vm.currentTask!;
-    final userAns = _matrixKey.currentState!.getMatrix();
-    final correctAns = task.answer;
+    final user = _matrixKey.currentState!.getMatrix();
+    final correct = task.answer;
 
     _cellCorrectness = List.generate(
-      correctAns.length,
+      correct.length,
       (i) => List.generate(
-        correctAns[i].length,
-        (j) => userAns[i][j] == correctAns[i][j],
+        correct[i].length,
+        (j) => user[i][j] == correct[i][j],
       ),
     );
-    final allOk = _cellCorrectness.every((row) => row.every((x) => x));
 
+    final allOk = _cellCorrectness.every((row) => row.every((v) => v));
     setState(() {
       _answeredCorrectly = allOk;
     });
+
+    if (allOk) {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid != null) {
+        context.read<FirestoreService>().updateUserScore(uid: uid, delta: 3);
+      }
+    }
   }
 
-  /// Вызывается при нажатии "Продолжить"
+  /// Переход дальше после верного ответа
   void _onContinue() {
-    final userAns = _matrixKey.currentState!.getMatrix();
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid != null) {
-      _vm.submitAnswer(userAns, uid);
-    }
-    // После submitAnswer currentIndex уже увеличился
-
-    if (_vm.isComplete) {
-      // Последняя задача — уходим на главный
-      Navigator.popUntil(context, (r) => r.isFirst);
-      return;
-    }
-
-    // Иначе очищаем ввод и сбрасываем флаги для следующей задачи
-    _matrixKey.currentState!.clear();
-    setState(() {
-      _answeredCorrectly = false;
-      _cellCorrectness = [];
-    });
+    Navigator.pop(context);
   }
 
   @override
@@ -101,167 +109,163 @@ class _TaskViewState extends State<TaskView> {
     final vm = context.watch<TaskViewModel>();
 
     if (vm.isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     if (vm.hasError) {
-      return Scaffold(
-        body: Center(child: Text('Ошибка загрузки задач')),
-      );
+      return const Scaffold(body: Center(child: Text('Ошибка загрузки задач')));
     }
     final task = vm.currentTask;
     if (task == null) {
       return Scaffold(
         appBar: AppBar(title: Text(_getTitle(context))),
-        body: Center(child: Text('Задачи не найдены')),
+        body: const Center(child: Text('Задачи не найдены')),
       );
     }
 
+    // Кнопка подсказки
+    final hintButton = TaskActionButton(
+      icon: SvgPicture.asset(
+        'lib/assets/icons/hint.svg',
+        width: 26,
+        height: 26,
+        colorFilter: ColorFilter.mode(colors.hint, BlendMode.srcIn),
+      ),
+      title: loc.hintButton,
+      onTap: () {/* TODO */},
+      textColor: colors.hint,
+    );
+
+    // Кнопка проверки / продолжить
+    final done = _answeredCorrectly;
+    final secondTitle = done ? loc.continueBtn : loc.checkButton;
+    final secondIcon = SvgPicture.asset(
+      done
+          ? 'lib/assets/icons/arrow_right_simple.svg'
+          : 'lib/assets/icons/tick-circle.svg',
+      width: 26,
+      height: 26,
+      colorFilter: ColorFilter.mode(colors.successGreen, BlendMode.srcIn),
+    );
+    final secondAction = done ? _onContinue : _onCheck;
+
+    final actionButton = TaskActionButton(
+      icon: secondIcon,
+      title: secondTitle,
+      onTap: secondAction,
+      textColor: colors.successGreen,
+    );
+
+    // Ввод разрешён до правильного ответа
+    final inputEnabled = !done;
+
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(children: [
-            // ——— AppBar ———
-            Container(
-              height: 100,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              color: theme.appBarTheme.backgroundColor ?? theme.primaryColor,
-              child: Row(children: [
-                Material(
-                  shape: const CircleBorder(),
-                  color: colors.greetingText,
-                  child: IconButton(
-                    icon: SvgPicture.asset(
-                      'lib/assets/icons/arrow_left.svg',
-                      width: 26, height: 26,
-                      colorFilter:
-                          ColorFilter.mode(colors.text, BlendMode.srcIn),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              // отступ снизу под клавиатуру
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: ConstrainedBox(
+                // минимум — вся доступная высота
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // —— Верхняя секция — AppBar + текст + матрицы
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // AppBar-подобная шапка
+                        Container(
+                          height: 100,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          color: theme.appBarTheme.backgroundColor ??
+                              theme.primaryColor,
+                          child: Row(
+                            children: [
+                              Material(
+                                shape: const CircleBorder(),
+                                color: colors.greetingText,
+                                child: IconButton(
+                                  icon: SvgPicture.asset(
+                                    'lib/assets/icons/arrow_left.svg',
+                                    width: 26,
+                                    height: 26,
+                                    colorFilter: ColorFilter.mode(
+                                        colors.text, BlendMode.srcIn),
+                                  ),
+                                  onPressed: () => Navigator.pop(context),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Text(
+                                  _getTitle(context),
+                                  style: theme.textTheme.headlineMedium,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(
+                            '${loc.task}: ${_getTaskSubtitle(loc, task!)}',
+                            style: theme.textTheme.bodyLarge,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        // Горизонтальный скролл матриц
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Row(
+                            children: [
+                              MatrixDisplay(matrix: task.matrixA),
+                              if (task.matrixB != null &&
+                                  task.matrixB!.isNotEmpty) ...[
+                                const SizedBox(width: 16),
+                                MatrixDisplay(matrix: task.matrixB!),
+                              ],
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                      ],
                     ),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    _getTitle(context),
-                    style: theme.textTheme.headlineMedium,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ]),
-            ),
 
-            const SizedBox(height: 16),
+                    // —— Средняя секция — MatrixInput без растягивания
+                    MatrixInput(
+                      key: _matrixKey,
+                      rows: task.answer.length,
+                      columns: task.answer.first.length,
+                      cellSize: 40,
+                      enabled: inputEnabled,
+                      cellCorrectness:
+                          _cellCorrectness.isEmpty ? null : _cellCorrectness,
+                    ),
 
-            // ——— Заголовок ———
-            Text(
-              'Задание: ${_getTitle(context)}',
-              style: theme.textTheme.bodyLarge,
-            ),
-
-            const SizedBox(height: 16),
-
-            // ——— Матрицы ———
-            InteractiveViewer(
-              panEnabled: true,
-              scaleEnabled: true,
-              minScale: 0.5,
-              maxScale: 3.0,
-              boundaryMargin: const EdgeInsets.all(20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  MatrixDisplay(matrix: task.matrixA),
-                  if (task.matrixB != null && task.matrixB!.isNotEmpty) ...[
-                    const SizedBox(width: 8),
-                    MatrixDisplay(matrix: task.matrixB!),
+                    // —— Нижняя секция — кнопки с отступом сверху и снизу
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: [
+                          Expanded(child: hintButton),
+                          const SizedBox(width: 16),
+                          Expanded(child: actionButton),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
                   ],
-                ],
+                ),
               ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // ——— Ввод ответа ———
-            MatrixInput(
-              key: _matrixKey,
-              rows: task.answer.length,
-              columns: task.answer.first.length,
-              cellSize: 40.0,
-              cellCorrectness:
-                  _cellCorrectness.isEmpty ? null : _cellCorrectness,
-            ),
-
-            const SizedBox(height: 24),
-
-            // ——— Кнопки ———
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(children: [
-                // подсказка
-                Expanded(
-                  child: TaskActionButton(
-                    initialIcon: SvgPicture.asset(
-                      'lib/assets/icons/hint.svg',
-                      width: 26,
-                      height: 26,
-                      colorFilter:
-                          ColorFilter.mode(colors.hint, BlendMode.srcIn),
-                    ),
-                    initialTitle: loc.hintButton,
-                    confirmedIcon: SvgPicture.asset(
-                      'lib/assets/icons/hint.svg',
-                      width: 26,
-                      height: 26,
-                      colorFilter:
-                          ColorFilter.mode(colors.hint, BlendMode.srcIn),
-                    ),
-                    confirmedTitle: loc.hintButton,
-                    textColor: colors.hint,
-                    onTap: () {/* TODO */},
-                    toggleOnTap: false,
-                  ),
-                ),
-
-                const SizedBox(width: 16),
-
-                // Check / Continue
-                Expanded(
-                  child: TaskActionButton(
-                    initialIcon: SvgPicture.asset(
-                      _answeredCorrectly
-                          ? 'lib/assets/icons/arrow_right_simple.svg'
-                          : 'lib/assets/icons/tick-circle.svg',
-                      width: 26, height: 26,
-                      colorFilter: ColorFilter.mode(
-                          colors.successGreen, BlendMode.srcIn),
-                    ),
-                    initialTitle: _answeredCorrectly
-                        ? loc.continueBtn
-                        : loc.checkButton,
-                    confirmedIcon: SvgPicture.asset(
-                      _answeredCorrectly
-                          ? 'lib/assets/icons/arrow_right_simple.svg'
-                          : 'lib/assets/icons/tick-circle.svg',
-                      width: 26, height: 26,
-                      colorFilter: ColorFilter.mode(
-                          colors.successGreen, BlendMode.srcIn),
-                    ),
-                    confirmedTitle: _answeredCorrectly
-                        ? loc.continueBtn
-                        : loc.checkButton,
-                    textColor: colors.successGreen,
-                    onTap: _answeredCorrectly ? _onContinue : _onCheck,
-                    toggleOnTap: false,
-                  ),
-                ),
-              ]),
-            ),
-
-            const SizedBox(height: 16),
-          ]),
+            );
+          },
         ),
       ),
     );
@@ -282,7 +286,6 @@ class _TaskViewState extends State<TaskView> {
   }
 }
 
-/// Расширение для TaskType, возвращает имя коллекции в Firestore
 extension on TaskType {
   String get firestoreCategory {
     switch (this) {

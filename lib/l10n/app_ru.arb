@@ -234,5 +234,25 @@
   "cancel": "Отмена",
   "@cancel": {
     "description": "Надпись на кнопке отмены в диалогах"
+  },
+    "taskAddition": "Сложить матрицы",
+  "@taskAddition": {
+    "description": "Описание задания: сложение двух матриц"
+  },
+  "taskSubtraction": "Вычесть вторую матрицу из первой",
+  "@taskSubtraction": {
+    "description": "Описание задания: вычитание матриц (A − B)"
+  },
+  "taskMultiplication": "Перемножить матрицы",
+  "@taskMultiplication": {
+    "description": "Описание задания: умножение двух матриц"
+  },
+  "taskDeterminant": "Найти определитель матрицы",
+  "@taskDeterminant": {
+    "description": "Описание задания: вычислить определитель"
+  },
+  "taskInverse": "Найти обратную матрицу",
+  "@taskInverse": {
+    "description": "Описание задания: вычислить обратную матрицу"
   }
 }

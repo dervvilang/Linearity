@@ -1,29 +1,20 @@
 // lib/view_models/task_vm.dart
-
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:linearity/services/firestore_service.dart';
 import 'package:linearity/models/matrix_task.dart';
 
-/// ViewModel для экрана выполнения заданий:
-/// - загружает 3 случайные задачи из Firestore,
-/// - хранит состояние (загрузка/ошибка/текущий номер),
-/// - проверяет ответы и обновляет очки пользователя.
+/// ViewModel для экрана выполнения заданий
 class TaskViewModel extends ChangeNotifier {
   final FirestoreService _fs;
 
-  /// Список загруженных задач
   List<MatrixTask> tasks = [];
-
-  /// Индекс текущей задачи (0..tasks.length-1)
   int currentIndex = 0;
-
-  /// Флаги состояния
   bool isLoading = false;
   bool hasError = false;
 
   TaskViewModel(this._fs);
 
-  /// Загружает [count] случайных задач для [category]/[level]
   Future<void> loadTasks({
     required String category,
     required int level,
@@ -39,38 +30,35 @@ class TaskViewModel extends ChangeNotifier {
         level: level,
         count: count,
       );
-      print("loaded ${tasks.length} tasks");
+      print('✅ loaded ${tasks.length} tasks');
       currentIndex = 0;
-    } catch (e) {
+    } catch (e, st) {
       hasError = true;
+      print('❌ Error in loadTasks: $e\n$st');
     }
 
     isLoading = false;
     notifyListeners();
   }
 
-  /// Возвращает true, если текущая задача решена верно.
-  /// Если да — увеличивает счёт, переходит к следующей задаче и нотифай.
   bool submitAnswer(List<List<num>> userAnswer, String uid) {
-    if (currentIndex >= tasks.length) return false;
+    if (currentIndex >= tasks.length || tasks.isEmpty)
+      return false; // Добавить проверку на пустоту
+    final correct = tasks[currentIndex].answer;
+    final ok = listEquals(userAnswer, correct);
 
-    final correctAnswer = tasks[currentIndex].answer;
-    final isCorrect = listEquals(userAnswer, correctAnswer);
-
-    if (isCorrect) {
-      // Начисляем пользователю, например, 10 очков
-      _fs.updateUserScore(uid: uid, delta: 10);
-      currentIndex++;
-      notifyListeners();
+    if (ok) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Обновлять после кадра
+        _fs.updateUserScore(uid: uid, delta: 10);
+        currentIndex++;
+        notifyListeners();
+      });
     }
-
-    return isCorrect;
+    return ok;
   }
 
-  /// Готовы ли все задачи?
   bool get isComplete => currentIndex >= tasks.length;
-
-  /// Текущая задача
   MatrixTask? get currentTask =>
       currentIndex < tasks.length ? tasks[currentIndex] : null;
 }

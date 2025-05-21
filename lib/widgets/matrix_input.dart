@@ -1,5 +1,3 @@
-// lib/widgets/matrix_input.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:linearity/themes/additional_colors.dart';
@@ -8,15 +6,20 @@ class MatrixInput extends StatefulWidget {
   final int rows;
   final int columns;
   final double cellSize;
-  /// Если не null — подсвечиваем ячейки: true → зелёный, false → красный
+
+  /// Подсветка ячеек: `true → зелёный`, `false → красный`
   final List<List<bool>>? cellCorrectness;
+
+  /// Можно ли редактировать поля (чтобы на время «проверки» выключать клавиатуру)
+  final bool enabled;
 
   const MatrixInput({
     super.key,
     required this.rows,
     required this.columns,
-    this.cellSize = 50.0,
+    this.cellSize = 50,
     this.cellCorrectness,
+    this.enabled = true, // ← новое свойство
   });
 
   @override
@@ -25,6 +28,7 @@ class MatrixInput extends StatefulWidget {
 
 class MatrixInputState extends State<MatrixInput> {
   late final List<List<TextEditingController>> _controllers;
+  bool get mounted => super.mounted;
 
   @override
   void initState() {
@@ -38,14 +42,13 @@ class MatrixInputState extends State<MatrixInput> {
   @override
   void dispose() {
     for (final row in _controllers) {
-      for (final c in row) {
-        c.dispose();
-      }
+      for (final c in row) c.dispose();
     }
     super.dispose();
   }
 
-  /// Возвращает текущие введённые значения как List<List<num>>.
+  /* ——— API ——— */
+
   List<List<num>> getMatrix() {
     return _controllers.map((row) {
       return row.map((c) {
@@ -55,14 +58,16 @@ class MatrixInputState extends State<MatrixInput> {
     }).toList();
   }
 
-  /// Очищает все поля ввода
   void clear() {
+    if (!mounted) return; // Ensure the state is still active
     for (final row in _controllers) {
       for (final c in row) {
         c.text = '';
       }
     }
   }
+
+  /* ——— UI ——— */
 
   @override
   Widget build(BuildContext context) {
@@ -78,41 +83,27 @@ class MatrixInputState extends State<MatrixInput> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Ответ:',
-            style: theme.textTheme.titleMedium!
-                .copyWith(fontWeight: FontWeight.bold, color: colors.text),
-          ),
+          Text('Ответ:',
+              style: theme.textTheme.titleMedium!
+                  .copyWith(fontWeight: FontWeight.bold, color: colors.text)),
           const SizedBox(height: 8),
           IntrinsicHeight(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: FittedBox(
-                    child: Text(
-                      '(',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w200,
-                        color: colors.text,
-                      ),
-                    ),
-                  ),
-                ),
+                _bracket('(', colors.text),
                 Table(
                   defaultColumnWidth: FixedColumnWidth(widget.cellSize + 8),
                   defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                   children: List.generate(widget.rows, (i) {
                     return TableRow(
                       children: List.generate(widget.columns, (j) {
-                        // Выбираем цвет текста
-                        Color txtColor = colors.text;
-                        if (widget.cellCorrectness != null) {
-                          final ok = widget.cellCorrectness![i][j];
-                          txtColor = ok ? Colors.green : Colors.red;
-                        }
+                        final ok = widget.cellCorrectness?[i][j];
+                        final txt = ok == null
+                            ? colors.text
+                            : (ok ? Colors.green : Colors.red);
+
                         return Padding(
                           padding: const EdgeInsets.all(4),
                           child: Container(
@@ -124,18 +115,16 @@ class MatrixInputState extends State<MatrixInput> {
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: TextField(
+                              readOnly: !widget.enabled, // ← ключ!
                               controller: _controllers[i][j],
                               textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 16, color: txtColor),
+                              style: TextStyle(fontSize: 16, color: txt),
                               keyboardType:
                                   const TextInputType.numberWithOptions(
-                                signed: true,
-                                decimal: true,
-                              ),
+                                      signed: true, decimal: true),
                               inputFormatters: [
                                 FilteringTextInputFormatter.allow(
-                                  RegExp(r'[-\d.,]'),
-                                ),
+                                    RegExp(r'[-\d.,]')),
                               ],
                               decoration: const InputDecoration(
                                 isDense: true,
@@ -149,18 +138,7 @@ class MatrixInputState extends State<MatrixInput> {
                     );
                   }),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: FittedBox(
-                    child: Text(
-                      ')',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w200,
-                        color: colors.text,
-                      ),
-                    ),
-                  ),
-                ),
+                _bracket(')', colors.text),
               ],
             ),
           ),
@@ -168,4 +146,12 @@ class MatrixInputState extends State<MatrixInput> {
       ),
     );
   }
+
+  Widget _bracket(String ch, Color color) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: FittedBox(
+          child: Text(ch,
+              style: TextStyle(fontWeight: FontWeight.w200, color: color)),
+        ),
+      );
 }
