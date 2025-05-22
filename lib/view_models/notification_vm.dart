@@ -1,7 +1,4 @@
 // lib/view_models/notification_vm.dart
-//
-// ViewModel хранит флаг в SharedPreferences и
-// запускает / останавливает напоминания через NotificationService.
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,20 +10,20 @@ class NotificationViewModel extends ChangeNotifier {
   final NotificationService _svc;
   final SharedPreferences _prefs;
 
+  /// Конструктор ViewModel для уведомлений
   NotificationViewModel(this._svc, this._prefs);
 
+  /// Проверяет, включены ли напоминания
   bool get isEnabled => _prefs.getBool(_key) ?? false;
 
+  /// Включает или выключает напоминания
   Future<void> toggle(bool enable) async {
     await _prefs.setBool(_key, enable);
-
     if (enable) {
-      await _svc.scheduleHourly();   // ← включаем ежечасовые
-      // await _svc.scheduleTestMinute(); // ← вариант для отладки
+      await _svc.scheduleHourly();  
     } else {
       await _svc.cancelAll();
     }
-
     notifyListeners();
   }
 }

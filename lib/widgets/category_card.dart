@@ -1,6 +1,9 @@
+// lib/widgets/category_card.dart
+
 import 'package:flutter/material.dart';
 import 'package:linearity/themes/additional_colors.dart';
 
+/// Карточка категории заданий
 class CategoryCard extends StatelessWidget {
   final Widget icon;
   final String title;
@@ -23,26 +26,25 @@ class CategoryCard extends StatelessWidget {
     final additionalColors = theme.extension<AdditionalColors>()!;
 
     return Card(
-      elevation: 0,
+      /// Фон карточки
       color: color,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
       child: InkWell(
+        /// Обработка касания
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Container(
-          // Фиксированная высота для всех карточек
           height: 140,
           padding: const EdgeInsets.all(16),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center, // Центрирование содержимого
+            /// Содержимое по верхнему краю
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  icon,
+                  icon,  
                   const SizedBox(width: 8),
                   Text(
                     title,

@@ -4,33 +4,30 @@ import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:linearity/models/user.dart';
 
-/// Сервис для регистрации, входа, выхода и получения текущего пользователя.
+/// Сервис для регистрации, входа, выхода и получения текущего пользователя  
 class AuthService {
   final fb_auth.FirebaseAuth _auth = fb_auth.FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  /// Поток AppUser?, который
-  /// 1) слушает authStateChanges() для входа/выхода,
-  /// 2) при залогине переключается на snapshots() документа Firestore,
-  ///    чтобы при любом изменении профиля отдавать новое значение.
+  /// Поток AppUser? который слушает изменения статуса авторизации и профиль в Firestore  
   Stream<AppUser?> get user {
     return _auth.authStateChanges().asyncExpand((fbUser) {
       if (fbUser == null) {
-        // При логауте возвращаем null и завершаем поток документа
+        // при логауте возвращаем null  
         return Stream.value(null);
       }
-      // Слушаем документ пользователя в Firestore
+      // слушаем документ пользователя в Firestore  
       return _firestore
           .collection('users')
           .doc(fbUser.uid)
           .snapshots()
-          .handleError((_) {})
+          .handleError((_) {}) 
           .map((snap) =>
               snap.exists ? AppUser.fromMap({...snap.data()!, 'id': snap.id}) : null);
     });
   }
 
-  /// Зарегистрировать нового пользователя и создать профиль в Firestore.
+  /// Регистрация нового пользователя и создание его профиля в Firestore  
   Future<AppUser> signUp({
     required String email,
     required String password,
@@ -56,7 +53,7 @@ class AuthService {
     return newUser;
   }
 
-  /// Войти в существующий аккаунт.
+  /// Вход в существующий аккаунт  
   Future<AppUser> signIn({
     required String email,
     required String password,
@@ -73,13 +70,12 @@ class AuthService {
     return AppUser.fromMap({...doc.data()!, 'id': doc.id});
   }
 
-  /// Выйти из аккаунта.
+  /// Выход из аккаунта  
   Future<void> signOut() async {
     await _auth.signOut();
   }
 
-  /// Обновить любые поля профиля (username, avatarAsset, description).
-  /// Если передано null — поле не меняется.
+  /// Обновление полей профиля (username, avatarAsset, description)  
   Future<void> updateProfileFields({
     required String uid,
     String? username,
@@ -95,7 +91,7 @@ class AuthService {
     }
   }
 
-  /// Update user email with reauthentication
+  /// Обновление email пользователя с повторной аутентификацией  
   Future<void> updateEmail(String newEmail, String currentPassword) async {
     final user = _auth.currentUser;
     if (user == null) {
@@ -108,17 +104,15 @@ class AuthService {
       password: currentPassword,
     );
     await user.reauthenticateWithCredential(cred);
-
     await user.updateEmail(newEmail);
     await user.sendEmailVerification();
-
-    // Также синхронизируем email в Firestore
+    // синхронизируем email в Firestore  
     await _firestore.collection('users').doc(user.uid).update({
       'email': newEmail,
     });
   }
 
-  /// Update user password; requires recent login
+  /// Обновление пароля пользователя с повторной аутентификацией  
   Future<void> updatePassword(String newPassword, String currentPassword) async {
     final user = _auth.currentUser;
     if (user == null) {
@@ -131,11 +125,10 @@ class AuthService {
       password: currentPassword,
     );
     await user.reauthenticateWithCredential(cred);
-
     await user.updatePassword(newPassword);
   }
 
-  /// Delete user account entirely (Auth only)
+  /// Удаление аккаунта из Firebase Auth  
   Future<void> deleteAccount() async {
     final user = _auth.currentUser;
     if (user == null) {

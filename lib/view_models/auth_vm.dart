@@ -7,18 +7,21 @@ import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:linearity/models/user.dart';
 import 'package:linearity/services/auth_service.dart';
 
-/// ViewModel для авторизации и работы с текущим пользователем.
+/// ViewModel для авторизации и текущего пользователя
 class AuthViewModel extends ChangeNotifier {
+  /// Сервис авторизации
   final AuthService _service;
-
+  /// Текущий пользователь
   AppUser? user;
+  /// Флаг загрузки
   bool isLoading = true;
+  /// Текст ошибки
   String? error;
 
   late final StreamSubscription<AppUser?> _userSub;
 
+  /// Подписывается на поток пользователя
   AuthViewModel({AuthService? service}) : _service = service ?? AuthService() {
-    // Подписываемся на поток, ловим ошибки и отменяем в dispose
     _userSub = _service.user.listen(
       (appUser) {
         user = appUser;
@@ -26,7 +29,6 @@ class AuthViewModel extends ChangeNotifier {
         notifyListeners();
       },
       onError: (_) {
-        // При ошибках (например, после signOut) просто сбрасываем состояние
         user = null;
         isLoading = false;
         notifyListeners();
@@ -40,7 +42,7 @@ class AuthViewModel extends ChangeNotifier {
     super.dispose();
   }
 
-  /// Преобразует код FirebaseAuthException в понятное пользователю сообщение.
+  /// Преобразует код ошибки Firebase в сообщение
   String _mapFirebaseError(String code) {
     switch (code) {
       case 'invalid-email':
@@ -53,20 +55,20 @@ class AuthViewModel extends ChangeNotifier {
         return 'Такой e-mail уже зарегистрирован';
       case 'weak-password':
         return 'Пароль слишком короткий';
-      case 'invalid-credential': // ← ловим и эту ошибку
+      case 'invalid-credential':
         return 'Неверный пароль';
       default:
         return 'Ошибка: $code';
     }
   }
 
-  /// Сбрасывает текущее сообщение об ошибке.
+  /// Сбрасывает текст ошибки
   void clearError() {
     error = null;
     notifyListeners();
   }
 
-  /// Регистрация нового пользователя.
+  /// Регистрирует нового пользователя
   Future<void> register({
     required String email,
     required String password,
@@ -92,7 +94,7 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  /// Вход существующего пользователя.
+  /// Входит в существующий аккаунт
   Future<void> login({
     required String email,
     required String password,
@@ -116,13 +118,12 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  /// Выход из аккаунта.
+  /// Выходит из аккаунта
   Future<void> logout() async {
     await _service.signOut();
-    // По authStateChanges получим null и обновим состояние
   }
 
-  /// Обновление полей профиля (username, avatarAsset, description).
+  /// Обновляет поля профиля
   Future<void> updateProfile({
     String? username,
     String? avatarAsset,
@@ -143,7 +144,6 @@ class AuthViewModel extends ChangeNotifier {
         description: description,
       );
 
-      // Локально обновляем модель
       user = user!.copyWith(
         username: username,
         avatarAsset: avatarAsset,

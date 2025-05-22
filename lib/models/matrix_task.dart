@@ -1,6 +1,6 @@
 // lib/models/matrix_task.dart
 
-/// Тип операции
+/// Тип операции с матрицами
 enum OperationType {
   addition,
   subtraction,
@@ -9,7 +9,7 @@ enum OperationType {
   inverse,
 }
 
-/// Задача над матрицами (или детерминант)
+/// Задача с матрицами
 class MatrixTask {
   final String id;
   final OperationType type;
@@ -18,6 +18,7 @@ class MatrixTask {
   final List<List<num>>? matrixB;
   final List<List<num>> answer;
 
+  /// Инициализирует задачу с заданным типом операции и ответом
   MatrixTask({
     required this.id,
     required this.type,
@@ -27,8 +28,9 @@ class MatrixTask {
     required this.answer,
   });
 
+  /// Создаёт MatrixTask из JSON-данных
   factory MatrixTask.fromJson(String id, Map<String, dynamic> json) {
-    // Парсер «матрицы» List<Map<'0':…, '1':…>> → List<List<num>>
+    /// Преобразует List<Map<'0':…, '1':…>> в List<List<num>>.
     List<List<num>> parseMatrix(List<dynamic>? raw) {
       if (raw == null) return <List<num>>[];
       return raw.map<List<num>>((row) {
@@ -40,27 +42,25 @@ class MatrixTask {
       }).toList();
     }
 
-    // Определяем enum из json['type']
+    // Определяем тип операции из строки
     final rawType = (json['type'] as String).toLowerCase();
     final opType = OperationType.values.firstWhere(
       (e) => e.toString().split('.').last == rawType,
       orElse: () => throw ArgumentError('Unknown OperationType: $rawType'),
     );
 
-    // matrixA всегда есть
+    // Разбор первой матрицы
     final a = parseMatrix(json['matrixA'] as List<dynamic>?);
 
-    // matrixB есть только для add/sub/mult
+    // Разбор второй матрицы (если есть)
     final b = (json.containsKey('matrixB'))
         ? parseMatrix(json['matrixB'] as List<dynamic>?)
         : null;
 
-    // ответ: если детерминант — число → упакуем в 1×1
+    // Разбор ответа: для детерминанта упаковываем число в 1×1
     final answerField = json['answer'];
     final ans = (opType == OperationType.determinant && answerField is num)
-        ? <List<num>>[
-            <num>[answerField]
-          ]
+        ? <List<num>>[<num>[answerField]]
         : parseMatrix(json['answer'] as List<dynamic>?);
 
     return MatrixTask(
@@ -73,8 +73,9 @@ class MatrixTask {
     );
   }
 
+  /// Преобразует MatrixTask в JSON-формат для хранения или передачи
   Map<String, dynamic> toJson() {
-    // Утилита: List<List<num>> → List<Map<String,num>>
+    /// Кодирует строку матрицы в список карт index→value
     List<Map<String, num>> encodeRow(List<num> row) {
       return [
         for (int i = 0; i < row.length; i++) {i.toString(): row[i]}
@@ -91,8 +92,10 @@ class MatrixTask {
       data['matrixB'] = matrixB!.map((r) => encodeRow(r)).toList();
     }
 
-    // Если это детерминант и answer — 1×1, то кладём скаляр
-    if (type == OperationType.determinant && answer.length == 1 && answer[0].length == 1) {
+    // Для детерминанта кодируем скаляр вместо матрицы 1×1
+    if (type == OperationType.determinant &&
+        answer.length == 1 &&
+        answer[0].length == 1) {
       data['answer'] = answer[0][0];
     } else {
       data['answer'] = answer.map((r) => encodeRow(r)).toList();

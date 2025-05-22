@@ -1,4 +1,5 @@
 // lib/views/setting_view.dart
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
@@ -19,23 +20,25 @@ class SettingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final loc     = AppLocalizations.of(context)!;
-    final theme   = Theme.of(context);
-    final colors  = theme.extension<AdditionalColors>()!;
-    final themeVm = context.watch<ThemeViewModel>();
-    final notifVm = context.watch<NotificationViewModel>();
-    final localeCtl = context.watch<LocaleController>(); // <- контроллер языка
+    final loc      = AppLocalizations.of(context)!;
+    final theme    = Theme.of(context);
+    final colors   = theme.extension<AdditionalColors>()!;
+    final themeVm  = context.watch<ThemeViewModel>();
+    final notifVm  = context.watch<NotificationViewModel>();
+    final localeCtl = context.watch<LocaleController>();
 
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
+            /// Заголовок экрана настроек
             Container(
               height: 90,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               color: theme.appBarTheme.backgroundColor ?? theme.primaryColor,
               child: Row(
                 children: [
+                  /// Кнопка назад
                   Material(
                     shape: const CircleBorder(),
                     color: colors.greetingText,
@@ -50,6 +53,7 @@ class SettingView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 16),
+                  /// Название раздела
                   Expanded(
                     child: Text(
                       loc.settingsTitle,
@@ -60,15 +64,14 @@ class SettingView extends StatelessWidget {
                 ],
               ),
             ),
-
             const SizedBox(height: 8),
 
-            // ── список настроек ─────────────────────────────────────────────
+            /// Список настроек
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.all(8),
                 children: [
-                  // ─────────── профиль ───────────
+                  /// Редактировать профиль
                   SettingCard(
                     title: loc.editProfile,
                     onTap: () => Navigator.of(context).pushNamed('/editProfile'),
@@ -81,7 +84,7 @@ class SettingView extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
 
-                  // ─────────── Светлая / тёмная тема ───────────
+                  /// Светлая/тёмная тема
                   SettingCard(
                     title: loc.lightDarkTheme,
                     backColor: colors.ratingCard,
@@ -89,26 +92,23 @@ class SettingView extends StatelessWidget {
                       value: themeVm.isDark,
                       onChanged: themeVm.toggleTheme,
                     ),
-                    onTap: () {}, // необязательно
+                    onTap: () {},
                   ),
                   const SizedBox(height: 4),
 
-                  // ─────────── Переключатель языка ───────────
+                  /// Выбор языка приложения
                   SettingCard(
-                    // Добавьте соответствующую строку в l10n (например, "language")
                     title: loc.languageLabel,
                     backColor: colors.ratingCard,
                     trailing: Switch(
-                      // true == русский, false == английский
                       value: localeCtl.locale?.languageCode == 'ru',
-                      onChanged: (val) => localeCtl
-                          .setLocale(Locale(val ? 'ru' : 'en')),
+                      onChanged: (val) => localeCtl.setLocale(Locale(val ? 'ru' : 'en')),
                     ),
                     onTap: () {},
                   ),
                   const SizedBox(height: 4),
 
-                  // ─────────── Уведомления ───────────
+                  /// Уведомления
                   SettingCard(
                     title: loc.notifications,
                     backColor: colors.ratingCard,
@@ -116,11 +116,11 @@ class SettingView extends StatelessWidget {
                       value: notifVm.isEnabled,
                       onChanged: (val) => notifVm.toggle(val),
                     ),
-                    onTap: () {}, // или notifVm.toggle
+                    onTap: () {},
                   ),
                   const SizedBox(height: 4),
 
-                  // ─────────── Выход из аккаунта ───────────
+                  /// Выход из аккаунта
                   SettingCard(
                     title: loc.exitButton,
                     onTap: () async {
@@ -134,7 +134,7 @@ class SettingView extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
 
-                  // ─────────── Закрыть приложение ───────────
+                  /// Закрыть приложение
                   SettingCard(
                     title: loc.closeApp,
                     onTap: () => SystemNavigator.pop(),

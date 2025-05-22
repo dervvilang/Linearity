@@ -1,7 +1,8 @@
+// lib/themes/additional_colors.dart
+
 import 'package:flutter/material.dart';
 
 /// Дополнительное расширение темы для хранения цветов, которые не входят в стандартный ColorScheme.
-/// Эти цвета можно использовать в кастомных виджетах, и они будут автоматически меняться при переключении темы.
 @immutable
 class AdditionalColors extends ThemeExtension<AdditionalColors> {
   final Color scaffold;

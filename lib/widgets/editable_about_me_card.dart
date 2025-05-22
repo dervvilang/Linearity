@@ -1,7 +1,6 @@
 // lib/widgets/editable_about_me_card.dart
 
 import 'package:flutter/material.dart';
-import 'package:linearity/themes/additional_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:linearity/view_models/auth_vm.dart';
@@ -19,10 +18,10 @@ class _EditableAboutMeCardState extends State<EditableAboutMeCard> {
   final FocusNode _focusNode = FocusNode();
   String savedText = '';
 
+  /// Загружает текущее описание пользователя
   @override
   void initState() {
     super.initState();
-    // Загружаем текущее описание
     final appUser = context.read<AuthViewModel>().user;
     savedText = appUser?.description ?? '';
     _controller.text = savedText;
@@ -35,36 +34,27 @@ class _EditableAboutMeCardState extends State<EditableAboutMeCard> {
     super.dispose();
   }
 
+  /// Отменяет редактирование и возвращает старый текст
   void _cancelEditing() {
-    if (!mounted) return;
     setState(() {
       _controller.text = savedText;
       isEditing = false;
     });
   }
 
+  /// Сохраняет новое описание через ViewModel
   Future<void> _saveEditing() async {
     final newText = _controller.text.trim();
-
-    // Если ничего не изменилось — просто выйти из режима редактирования
     if (newText == savedText) {
-      if (!mounted) return;
       setState(() => isEditing = false);
       return;
     }
-
     final authVm = context.read<AuthViewModel>();
-
-    // Сохраняем только поле description
     await authVm.updateProfile(description: newText);
-
-    if (!mounted) return;
     setState(() {
       savedText = newText;
       isEditing = false;
     });
-
-    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(AppLocalizations.of(context)!.profileSaved)),
     );
@@ -73,18 +63,16 @@ class _EditableAboutMeCardState extends State<EditableAboutMeCard> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-    final colors = theme.extension<AdditionalColors>()!;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Card(
-          elevation: 4,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: isEditing
+                /// Поле ввода при редактировании
                 ? TextField(
                     controller: _controller,
                     focusNode: _focusNode,
@@ -96,9 +84,9 @@ class _EditableAboutMeCardState extends State<EditableAboutMeCard> {
                       ),
                     ),
                   )
+                /// Текстовое поле при просмотре
                 : GestureDetector(
                     onTap: () {
-                      if (!mounted) return;
                       setState(() => isEditing = true);
                       _focusNode.requestFocus();
                     },
@@ -106,7 +94,7 @@ class _EditableAboutMeCardState extends State<EditableAboutMeCard> {
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
                       child: Text(
-                        savedText.isEmpty ? '${loc.profileAbout}:' : savedText,
+                        savedText.isEmpty ? loc.profileAbout : savedText,
                         style: const TextStyle(fontSize: 18),
                       ),
                     ),

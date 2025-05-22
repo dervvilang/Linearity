@@ -1,7 +1,9 @@
+// lib/widgets/rating_card.dart
+
 import 'package:flutter/material.dart';
 import 'package:linearity/themes/additional_colors.dart';
 
-/// Виджет для горизонтальной карточки рейтинга/баллов.
+/// Горизонтальная карточка рейтинга или очков
 class RatingCard extends StatelessWidget {
   final Widget icon;
   final String title;
@@ -18,19 +20,19 @@ class RatingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Получаем текущую тему приложения.
     final theme = Theme.of(context);
-    // Получаем дополнительное расширение для цветов.
     final additionalColors = theme.extension<AdditionalColors>()!;
 
+    /// Фон карточки берётся из AdditionalColors
     return Card(
-      color: additionalColors.ratingCard, // Например, добавьте поле ratingCard в AdditionalColors.
+      color: additionalColors.ratingCard,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        /// Обрабатывает нажатие
         onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Row(
@@ -40,14 +42,10 @@ class RatingCard extends StatelessWidget {
               const SizedBox(width: 8),
               Column(
                 children: [
-                  Text(
-                    title,
-                    style: theme.textTheme.titleMedium,
-                  ),
-                  Text(
-                    subtitle,
-                    style: theme.textTheme.titleSmall,
-                  ),
+                  /// Заголовок (например, ранг или сумма очков)
+                  Text(title, style: theme.textTheme.titleMedium),
+                  /// Подзаголовок (описание метрики)
+                  Text(subtitle, style: theme.textTheme.titleSmall),
                 ],
               )
             ],

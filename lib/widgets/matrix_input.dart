@@ -1,17 +1,18 @@
+// lib/widgets/matrix_input.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:linearity/themes/additional_colors.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+/// Поле ввода для матрицы
 class MatrixInput extends StatefulWidget {
   final int rows;
   final int columns;
   final double cellSize;
-
-  /// Подсветка ячеек: `true → зелёный`, `false → красный`
+  /// Подсветка корректности ответов
   final List<List<bool>>? cellCorrectness;
-
-  /// Можно ли редактировать поля (чтобы на время «проверки» выключать клавиатуру)
+  /// Включает или отключает ввод
   final bool enabled;
 
   const MatrixInput({
@@ -20,7 +21,7 @@ class MatrixInput extends StatefulWidget {
     required this.columns,
     this.cellSize = 50,
     this.cellCorrectness,
-    this.enabled = true, // ← новое свойство
+    this.enabled = true,
   });
 
   @override
@@ -30,6 +31,7 @@ class MatrixInput extends StatefulWidget {
 class MatrixInputState extends State<MatrixInput> {
   late final List<List<TextEditingController>> _controllers;
 
+  /// Создаёт контроллеры для всех ячеек
   @override
   void initState() {
     super.initState();
@@ -49,8 +51,7 @@ class MatrixInputState extends State<MatrixInput> {
     super.dispose();
   }
 
-  /* ——— API ——— */
-
+  /// Возвращает введённую матрицу чисел
   List<List<num>> getMatrix() {
     return _controllers.map((row) {
       return row.map((c) {
@@ -60,15 +61,15 @@ class MatrixInputState extends State<MatrixInput> {
     }).toList();
   }
 
+  /// Очищает все поля ввода
   void clear() {
-    if (!mounted) return; // Ensure the state is still active
+    if (!mounted) return;
     for (final row in _controllers) {
       for (final c in row) {
         c.text = '';
       }
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +118,7 @@ class MatrixInputState extends State<MatrixInput> {
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: TextField(
-                              readOnly: !widget.enabled, // ← ключ!
+                              readOnly: !widget.enabled,
                               controller: _controllers[i][j],
                               textAlign: TextAlign.center,
                               style: TextStyle(fontSize: 16, color: txt),
@@ -149,11 +150,14 @@ class MatrixInputState extends State<MatrixInput> {
     );
   }
 
+  /// Рисует скобку, растягивающуюся по высоте
   Widget _bracket(String ch, Color color) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: FittedBox(
-          child: Text(ch,
-              style: TextStyle(fontWeight: FontWeight.w200, color: color)),
+          child: Text(
+            ch,
+            style: TextStyle(fontWeight: FontWeight.w200, color: color),
+          ),
         ),
       );
 }

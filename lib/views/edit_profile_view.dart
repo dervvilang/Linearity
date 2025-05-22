@@ -24,6 +24,7 @@ class _EditProfileViewState extends State<EditProfileView> {
     final theme = Theme.of(context);
     final colors = theme.extension<AdditionalColors>()!;
 
+    /// Строит виджет аватара
     Widget buildAvatar() {
       return CircleAvatar(
         radius: 75,
@@ -36,6 +37,7 @@ class _EditProfileViewState extends State<EditProfileView> {
       );
     }
 
+    /// Показывает выбор доступных аватаров
     void showAvatarPicker() {
       showModalBottomSheet<String>(
         context: context,
@@ -64,10 +66,8 @@ class _EditProfileViewState extends State<EditProfileView> {
     }
 
     return Scaffold(
-      // убираем стандартный appBar
       body: Column(
         children: [
-          // кастомный AppBar
           SafeArea(
             child: Container(
               height: 90,
@@ -101,7 +101,7 @@ class _EditProfileViewState extends State<EditProfileView> {
             ),
           ),
 
-          // основное содержимое
+          /// Основное содержимое формы
           Expanded(
             child: vm.isLoading
                 ? const Center(child: CircularProgressIndicator())
@@ -112,7 +112,7 @@ class _EditProfileViewState extends State<EditProfileView> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          // Аватар
+                          /// Аватар с возможностью перетапа
                           Center(
                             child: GestureDetector(
                               onTap: showAvatarPicker,
@@ -131,7 +131,7 @@ class _EditProfileViewState extends State<EditProfileView> {
                           ),
                           const SizedBox(height: 24),
 
-                          // Никнейм
+                          /// Поле для редактирования никнейма
                           TextFormField(
                             initialValue: vm.username,
                             decoration: InputDecoration(
@@ -146,7 +146,7 @@ class _EditProfileViewState extends State<EditProfileView> {
                           ),
                           const SizedBox(height: 24),
 
-                          // Кнопка Сохранить
+                          /// Кнопка сохранения изменений
                           ElevatedButton(
                             onPressed: vm.hasChanges
                                 ? () async {
@@ -180,7 +180,7 @@ class _EditProfileViewState extends State<EditProfileView> {
                   ),
           ),
 
-          // Кнопка Удалить аккаунт, закреплена снизу
+          /// Кнопка удаления аккаунта
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: TextButton(

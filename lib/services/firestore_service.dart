@@ -5,11 +5,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:linearity/models/user.dart';
 import '../models/matrix_task.dart';
 
-/// Сервис для работы с задачами и пользовательскими данными в Firestore.
+/// Сервис для работы с задачами и пользовательскими данными в Firestore
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  /// Получает количество уровней для заданной категории задач.
+  /// Получает количество уровней для заданной категории задач
   Future<int> fetchLevelsCount(String category) async {
     final doc = await _db.collection('levels').doc(category).get();
     if (!doc.exists) return 0;
@@ -19,7 +19,7 @@ class FirestoreService {
         : 0;
   }
 
-  /// Получает текст подсказки для заданной категории задач.
+  /// Получает текст подсказки для заданной категории задач
   Future<String> fetchHint(String category) async {
     final doc = await _db.collection('levels').doc(category).get();
     if (!doc.exists) return 'Подсказка не найдена.';
@@ -29,13 +29,12 @@ class FirestoreService {
         : 'Подсказка не найдена.';
   }
 
-  /// Загружает все задачи для [category] и [level].
+  /// Загружает все задачи для [category] и [level]
   Future<List<MatrixTask>> fetchAllTasks({
     required String category,
     required int level,
   }) async {
     final path = 'levels/$category/level$level';
-    print('Загружаю задачи из $path');
 
     final snap = await _db
         .collection('levels')
@@ -46,7 +45,7 @@ class FirestoreService {
     return snap.docs.map((d) => MatrixTask.fromJson(d.id, d.data())).toList();
   }
 
-  /// Выбирает случайные [count] задач из переданного списка.
+  /// Выбирает случайные [count] задач из переданного списка
   List<MatrixTask> pickRandomTasks(List<MatrixTask> allTasks, int count) {
     if (allTasks.length <= count) return List.from(allTasks);
     final rand = Random();
@@ -59,7 +58,7 @@ class FirestoreService {
     return picked;
   }
 
-  /// Загружает [count] случайных задач для [category]/[level].
+  /// Загружает [count] случайных задач для [category]/[level]
   Future<List<MatrixTask>> fetchRandomTasks({
     required String category,
     required int level,
@@ -69,9 +68,8 @@ class FirestoreService {
     return pickRandomTasks(all, count);
   }
 
-  /* ───────────── очки + ранги ───────────── */
 
-  /// Увеличивает счёт пользователя на [delta] и пересчитывает ранги.
+  /// Увеличивает счёт пользователя на [delta] и пересчитывает ранги
   Future<void> updateUserScore({
     required String uid,
     required int delta,
@@ -85,7 +83,7 @@ class FirestoreService {
     await _recalculateRanks();
   }
 
-  /// Пересчитывает ранги всех пользователей и записывает их в поле `rank`.
+  /// Пересчитывает ранги всех пользователей и записывает их в поле `rank`
   Future<void> _recalculateRanks() async {
     final snap =
         await _db.collection('users').orderBy('score', descending: true).get();
@@ -98,7 +96,7 @@ class FirestoreService {
     await batch.commit();
   }
 
-  /// Читает пользователей с уже сохранёнными полями `rank` (Top-100 по умолчанию).
+  /// Читает пользователей с уже сохранёнными полями `rank` (Top-100 по умолчанию)
   Future<List<AppUser>> fetchUsers({int limit = 100}) async {
     final snap = await _db
         .collection('users')
@@ -111,9 +109,7 @@ class FirestoreService {
         .toList();
   }
 
-  /* ───────────── профиль ───────────── */
-
-  /// Обновляет профиль пользователя [uid] данными из [data].
+  /// Обновляет профиль пользователя [uid] данными из [data]
   Future<void> updateUserProfile(
     String uid,
     Map<String, dynamic> data,
@@ -127,7 +123,7 @@ class FirestoreService {
     return AppUser.fromJson(snap.data()!..['id'] = uid);
   }
 
-  /// Удаляет документ пользователя [uid].
+  /// Удаляет документ пользователя [uid]
   Future<void> deleteUserDoc(String uid) async {
     await _db.collection('users').doc(uid).delete();
   }

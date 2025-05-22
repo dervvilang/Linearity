@@ -1,3 +1,5 @@
+// lib/themes/theme.dart
+
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'additional_colors.dart';
@@ -86,7 +88,6 @@ final ThemeData lightTheme = ThemeData(
     type: BottomNavigationBarType.fixed,
   ),
 ).copyWith(
-  // Добавляем расширение AdditionalColors с дополнительными цветами для светлой темы.
   extensions: <ThemeExtension<dynamic>>[
     AdditionalColors(
       scaffold: AppColors.scaffoldLight,
@@ -195,7 +196,6 @@ final ThemeData darkTheme = ThemeData(
     type: BottomNavigationBarType.fixed,
   ),
 ).copyWith(
-  // Добавляем расширение AdditionalColors с дополнительными цветами для тёмной темы.
   extensions: <ThemeExtension<dynamic>>[
     AdditionalColors(
       scaffold: AppColors.scaffoldDark,

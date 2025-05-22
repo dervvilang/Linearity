@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import '../services/auth_service.dart';
-import '../services/firestore_service.dart'; // если нужен для удаления
+import '../services/firestore_service.dart';
 import '../view_models/auth_vm.dart';
 
 class EditProfileViewModel extends ChangeNotifier {
   final AuthService _authService;
   final FirestoreService _firestoreService;
 
-  /// Список всех предустановленных SVG-аватарок
+  /// Список доступных SVG-аватарок
   final List<String> availableAvatars = [
     'lib/assets/icons/avatar_1.svg',
     'lib/assets/icons/avatar_2.svg',
@@ -24,12 +24,12 @@ class EditProfileViewModel extends ChangeNotifier {
     'lib/assets/icons/avatar_9.svg',
   ];
 
-  // Оригинальные значения для сравнения
+  /// Оригинальные значения для сравнения
   final String _origUsername;
   final String _origEmail;
   final String _origAvatarAsset;
 
-  // Поля, которыми оперируем в форме
+  /// Поля формы
   String username;
   String email;
   String avatarAsset;
@@ -39,7 +39,7 @@ class EditProfileViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  /// Конструктор, подтягивает текущие данные из AuthViewModel
+  /// Инициализирует поля из AuthViewModel
   EditProfileViewModel(
     BuildContext context, {
     AuthService? authService,
@@ -53,7 +53,7 @@ class EditProfileViewModel extends ChangeNotifier {
         email = context.read<AuthViewModel>().user!.email,
         avatarAsset = context.read<AuthViewModel>().user!.avatarAsset;
 
-  /// Есть ли изменения, чтобы активировать кнопку «Сохранить»
+  /// Проверяет, есть ли изменения
   bool get hasChanges {
     final avatarChanged = avatarAsset != _origAvatarAsset;
     final usernameChanged = username != _origUsername;
@@ -63,57 +63,62 @@ class EditProfileViewModel extends ChangeNotifier {
     return avatarChanged || usernameChanged || emailChanged || passwordChanged;
   }
 
-  /// Установить новый аватар
+  /// Устанавливает новый аватар
   void setAvatarAsset(String asset) {
     avatarAsset = asset;
     notifyListeners();
   }
 
+  /// Устанавливает новое имя пользователя
   void setUsername(String v) {
     username = v.trim();
     notifyListeners();
   }
 
+  /// Устанавливает новый email
   void setEmail(String v) {
     email = v.trim();
     notifyListeners();
   }
 
+  /// Устанавливает текущий пароль
   void setCurrentPassword(String v) {
     currentPassword = v;
     notifyListeners();
   }
 
+  /// Устанавливает новый пароль
   void setNewPassword(String v) {
     newPassword = v;
     notifyListeners();
   }
 
+  /// Сохраняет изменения профиля
   Future<void> saveChanges() async {
     _setLoading(true);
     try {
       final uid = fb_auth.FirebaseAuth.instance.currentUser!.uid;
 
-      // Аватар
       if (avatarAsset != _origAvatarAsset) {
+        /// Обновляет avatarAsset
         await _authService.updateProfileFields(
           uid: uid,
           avatarAsset: avatarAsset,
         );
       }
 
-      // Email (с реаутентификацией)
       if (email != _origEmail) {
+        /// Обновляет email с повторной аутентификацией
         await _authService.updateEmail(email, currentPassword);
       }
 
-      // Пароль
       if (newPassword.isNotEmpty) {
+        /// Обновляет пароль с повторной аутентификацией
         await _authService.updatePassword(newPassword, currentPassword);
       }
 
-      // Никнейм
       if (username != _origUsername) {
+        /// Обновляет username
         await _authService.updateProfileFields(
           uid: uid,
           username: username,
@@ -124,6 +129,7 @@ class EditProfileViewModel extends ChangeNotifier {
     }
   }
 
+  /// Удаляет аккаунт и документ пользователя
   Future<void> deleteAccount() async {
     _setLoading(true);
     try {
@@ -135,6 +141,7 @@ class EditProfileViewModel extends ChangeNotifier {
     }
   }
 
+  /// Устанавливает флаг загрузки
   void _setLoading(bool v) {
     _isLoading = v;
     notifyListeners();

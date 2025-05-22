@@ -17,9 +17,13 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
+  /// ключ формы для валидации
   final _formKey = GlobalKey<FormState>();
+  /// контроллер поля email
   final _emailCtrl = TextEditingController();
+  /// контроллер поля пароля
   final _passwordCtrl = TextEditingController();
+  /// флаг скрытия пароля
   bool _obscure = true;
 
   @override
@@ -29,6 +33,7 @@ class _LoginViewState extends State<LoginView> {
     super.dispose();
   }
 
+  /// выполняет вход и обрабатывает ошибки
   Future<void> _onLogin() async {
     if (!_formKey.currentState!.validate()) return;
     final auth = context.read<AuthViewModel>();
@@ -38,7 +43,6 @@ class _LoginViewState extends State<LoginView> {
     );
     if (!mounted) return;
 
-    // Если есть ошибка — показываем SnackBar и сбрасываем её
     if (auth.error != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -50,7 +54,6 @@ class _LoginViewState extends State<LoginView> {
       return;
     }
 
-    // При успешном входе — переходим на HomeView
     if (auth.user != null) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const HomeView()),
@@ -77,12 +80,14 @@ class _LoginViewState extends State<LoginView> {
             key: _formKey,
             child: Column(
               children: [
+                /// иконка профиля сверху
                 SvgPicture.asset(
                   'lib/assets/icons/profile.svg',
                   height: 120,
                   color: colors.text,
                 ),
                 const SizedBox(height: 32),
+                /// поле для email
                 TextFormField(
                   controller: _emailCtrl,
                   decoration: InputDecoration(labelText: loc.emailLabel),
@@ -91,6 +96,7 @@ class _LoginViewState extends State<LoginView> {
                       v != null && v.contains('@') ? null : loc.enterEmail,
                 ),
                 const SizedBox(height: 16),
+                /// поле для пароля
                 TextFormField(
                   controller: _passwordCtrl,
                   decoration: InputDecoration(
@@ -107,6 +113,7 @@ class _LoginViewState extends State<LoginView> {
                       v != null && v.length >= 6 ? null : loc.moreSix,
                 ),
                 const SizedBox(height: 24),
+                /// кнопка входа
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -124,6 +131,7 @@ class _LoginViewState extends State<LoginView> {
                   ),
                 ),
                 const SizedBox(height: 12),
+                /// переход к регистрации
                 TextButton(
                   onPressed: auth.isLoading
                       ? null

@@ -15,6 +15,7 @@ import 'package:linearity/widgets/editable_about_me_card.dart';
 import 'package:linearity/widgets/rating_card.dart';
 
 class ProfileView extends StatelessWidget {
+  /// Экран публичного профиля
   const ProfileView({super.key});
 
   @override
@@ -25,11 +26,13 @@ class ProfileView extends StatelessWidget {
     final authVm = context.watch<AuthViewModel>();
     final user = authVm.user;
 
+    /// Показывает индикатор, пока загружается профиль
     if (authVm.isLoading && user == null) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
     }
+    /// Перенаправляет на экран входа, если нет пользователя
     if (user == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context)
@@ -40,6 +43,7 @@ class ProfileView extends StatelessWidget {
 
     DateTime? lastPressed;
     return WillPopScope(
+      /// Обработка двойного нажатия назад для выхода
       onWillPop: () async {
         final now = DateTime.now();
         if (lastPressed == null ||
@@ -64,7 +68,7 @@ class ProfileView extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                // Настройки
+                /// Кнопка настроек в правом верхнем углу
                 Align(
                   alignment: Alignment.topRight,
                   child: Material(
@@ -95,7 +99,7 @@ class ProfileView extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
 
-                // Аватар
+                /// Аватар пользователя
                 CircleAvatar(
                   radius: 75,
                   backgroundColor: Colors.transparent,
@@ -108,11 +112,11 @@ class ProfileView extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
 
-                // Никнейм
+                /// Отображает никнейм
                 Text(user.username, style: theme.textTheme.headlineMedium),
                 const SizedBox(height: 10),
 
-                // Ранг, очки и «О себе»
+                /// Карточки с рангом, очками и раздел "О себе"
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: Column(
@@ -166,6 +170,7 @@ class ProfileView extends StatelessWidget {
           ),
         ),
         bottomNavigationBar: SafeArea(
+          /// Нижняя навигация по основным вкладкам
           child: BottomNavigationBar(
             currentIndex: 2,
             selectedItemColor: colors.greetingText,

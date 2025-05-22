@@ -8,18 +8,28 @@ import 'package:linearity/models/matrix_task.dart';
 class TaskViewModel extends ChangeNotifier {
   final FirestoreService _fs;
 
+  /// Список текущих задач
   List<MatrixTask> tasks = [];
+  /// Индекс текущей задачи
   int currentIndex = 0;
+  /// Флаг загрузки задач
   bool isLoading = false;
+  /// Флаг ошибки при загрузке
   bool hasError = false;
+  /// Матрица правильности введённых ответов
   List<List<bool>> cellCorrectness = [];
+  /// Флаг, что ответ верный
   bool answeredCorrectly = false;
 
+  /// Текст подсказки
   String? hintText;
+  /// Флаг загрузки подсказки
   bool isHintLoading = false;
 
+  /// Конструктор с FirestoreService
   TaskViewModel(this._fs);
 
+  /// Загружает случайные задачи
   Future<void> loadTasks({
     required String category,
     required int level,
@@ -46,7 +56,7 @@ class TaskViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Проверка ответа и обновление баллов
+  /// Проверяет ответ пользователя и обновляет очки
   Future<void> submitAnswer(List<List<num>> userAnswer, String uid) async {
     cellCorrectness = List.generate(
       tasks[currentIndex].answer.length,
@@ -56,14 +66,13 @@ class TaskViewModel extends ChangeNotifier {
       ),
     );
     answeredCorrectly = cellCorrectness.every((row) => row.every((v) => v));
-
     if (answeredCorrectly) {
       await _fs.updateUserScore(uid: uid, delta: 3);
     }
     notifyListeners();
   }
 
-  /// Загрузка текста подсказки для текущей категории
+  /// Загружает подсказку для категории
   Future<void> loadHint(String category) async {
     isHintLoading = true;
     notifyListeners();
@@ -74,8 +83,10 @@ class TaskViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Текущая задача или null
   MatrixTask? get currentTask =>
       (currentIndex < tasks.length) ? tasks[currentIndex] : null;
 
+  /// true, если задача решена
   bool get isComplete => answeredCorrectly;
 }

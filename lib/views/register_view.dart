@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:linearity/view_models/auth_vm.dart';
-import 'package:linearity/themes/additional_colors.dart';
 import 'package:linearity/views/login_view.dart';
 import 'package:linearity/views/home_view.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -31,6 +30,7 @@ class _RegisterViewState extends State<RegisterView> {
     super.dispose();
   }
 
+  /// Выполняет регистрацию нового пользователя
   Future<void> _onRegister() async {
     if (!_formKey.currentState!.validate()) return;
     final auth = context.read<AuthViewModel>();
@@ -60,11 +60,10 @@ class _RegisterViewState extends State<RegisterView> {
     }
   }
 
+  /// Строит экран регистрации
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthViewModel>();
-    final theme = Theme.of(context);
-    final colors = theme.extension<AdditionalColors>()!;
     final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -80,14 +79,20 @@ class _RegisterViewState extends State<RegisterView> {
             child: Column(
               children: [
                 SvgPicture.asset('lib/assets/icons/profile.svg', height: 120),
+
                 const SizedBox(height: 32),
+
+                /// Поле для имени пользователя
                 TextFormField(
                   controller: _usernameCtrl,
                   decoration: InputDecoration(labelText: loc.displayNameLabel),
                   validator: (v) =>
                       v != null && v.isNotEmpty ? null : loc.enterName,
                 ),
+
                 const SizedBox(height: 16),
+
+                /// Поле для email
                 TextFormField(
                   controller: _emailCtrl,
                   decoration: const InputDecoration(labelText: 'E-mail'),
@@ -95,7 +100,10 @@ class _RegisterViewState extends State<RegisterView> {
                   validator: (v) =>
                       v != null && v.contains('@') ? null : loc.enterEmail,
                 ),
+
                 const SizedBox(height: 16),
+
+                /// Поле для пароля
                 TextFormField(
                   controller: _passwordCtrl,
                   decoration: InputDecoration(
@@ -111,7 +119,10 @@ class _RegisterViewState extends State<RegisterView> {
                   validator: (v) =>
                       v != null && v.length >= 6 ? null : loc.moreSix,
                 ),
+
                 const SizedBox(height: 24),
+
+                /// Кнопка регистрации
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -128,7 +139,10 @@ class _RegisterViewState extends State<RegisterView> {
                         : Text(loc.registration2),
                   ),
                 ),
+
                 const SizedBox(height: 12),
+
+                /// Переход на экран входа
                 TextButton(
                   onPressed: auth.isLoading
                       ? null

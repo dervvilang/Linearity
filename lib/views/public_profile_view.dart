@@ -1,16 +1,4 @@
-/// -----------------------------------------------------------------------------
-/// lib/views/public_profile_view.dart
-/// -----------------------------------------------------------------------------
-/// Экран публичного профиля любого пользователя — аналог ProfileView,
-/// но без возможности редактирования.
-///
-/// Особенности реализации:
-/// * Использует ChangeNotifierProvider для PublicProfileViewModel,
-///   который загружает данные по [uid].
-/// * Показывает состояния загрузки, ошибки и основное содержимое:
-///   аватар, имя, ранг, баллы и описание профиля.
-/// * Убрана нижняя панель навигации.
-/// -----------------------------------------------------------------------------
+// lib/views/public_profile_view.dart
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -20,14 +8,12 @@ import 'package:provider/provider.dart';
 import 'package:linearity/themes/additional_colors.dart';
 import 'package:linearity/view_models/public_profile_vm.dart';
 import 'package:linearity/services/firestore_service.dart';
-import 'package:linearity/views/home_view.dart';
 import 'package:linearity/views/rating_view.dart';
 import 'package:linearity/widgets/rating_card.dart';
 
-/// Публичный профиль пользователя.
-/// Не позволяет редактировать данные — только просмотр.
+/// Экран публичного профиля пользователя
 class PublicProfileView extends StatelessWidget {
-  /// Идентификатор пользователя.
+  /// UID пользователя для загрузки
   final String uid;
 
   const PublicProfileView({
@@ -42,24 +28,24 @@ class PublicProfileView extends StatelessWidget {
     final colors = theme.extension<AdditionalColors>()!;
 
     return ChangeNotifierProvider(
+      /// Создаёт и запускает загрузку данных
       create: (_) => PublicProfileViewModel(
         firestoreService: context.read<FirestoreService>(),
         uid: uid,
       )..load(),
       child: Consumer<PublicProfileViewModel>(
         builder: (context, vm, _) {
+          /// Показывает индикатор при загрузке
           if (vm.isLoading) {
             return const Scaffold(
               body: Center(child: CircularProgressIndicator()),
             );
           }
+          /// Показывает ошибку, если загрузка не удалась
           if (vm.hasError || vm.user == null) {
             return Scaffold(
               body: Center(
-                child: Text(
-                  loc.loadError,
-                  style: theme.textTheme.bodyLarge,
-                ),
+                child: Text(loc.loadError, style: theme.textTheme.bodyLarge),
               ),
             );
           }
@@ -68,6 +54,7 @@ class PublicProfileView extends StatelessWidget {
 
           return Scaffold(
             appBar: AppBar(
+              /// Заголовок — никнейм пользователя
               title: Text(user.username),
               backgroundColor: theme.scaffoldBackgroundColor,
               elevation: 0,
@@ -78,7 +65,7 @@ class PublicProfileView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Аватар через локальный SVG
+                    /// Аватар пользователя
                     CircleAvatar(
                       radius: 75,
                       backgroundColor: Colors.transparent,
@@ -90,15 +77,10 @@ class PublicProfileView extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
-
-                    // Никнейм
-                    Text(
-                      user.username,
-                      style: theme.textTheme.headlineSmall,
-                    ),
+                    /// Отображает никнейм
+                    Text(user.username, style: theme.textTheme.headlineSmall),
                     const SizedBox(height: 24),
-
-                    // Статистика: ранг и очки
+                    /// Статистика: ранг и очки
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: Row(
@@ -144,8 +126,7 @@ class PublicProfileView extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 24),
-
-                    // Описание профиля в виде карточки
+                    /// Описание профиля
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Card(

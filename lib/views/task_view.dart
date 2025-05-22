@@ -33,6 +33,7 @@ class _TaskViewState extends State<TaskView> {
   late final TaskViewModel _vm;
   final _matrixKey = GlobalKey<MatrixInputState>();
 
+  /// Инициализирует VM и загружает задачу и подсказку
   @override
   void initState() {
     super.initState();
@@ -43,11 +44,11 @@ class _TaskViewState extends State<TaskView> {
         level: widget.level,
         count: 1,
       );
-
       _vm.loadHint(widget.taskType.firestoreCategory);
     });
   }
 
+  /// Возвращает текст операции задачи
   String _getTaskSubtitle(AppLocalizations loc, MatrixTask task) {
     switch (task.type) {
       case OperationType.addition:
@@ -63,19 +64,18 @@ class _TaskViewState extends State<TaskView> {
     }
   }
 
-  /// Проверка ответа через ViewModel
+  /// Проверяет ответ и обновляет очки
   Future<void> _onCheck() async {
     FocusScope.of(context).unfocus();
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
-
     await _vm.submitAnswer(
       _matrixKey.currentState!.getMatrix(),
       uid,
     );
   }
 
-  /// Переход дальше после верного ответа
+  /// Переходит на экран победы
   void _onContinue() {
     Navigator.pushReplacement(
       context,
@@ -91,15 +91,16 @@ class _TaskViewState extends State<TaskView> {
     final vm = context.watch<TaskViewModel>();
 
     if (vm.isLoading) {
+      /// Показывает индикатор загрузки
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     if (vm.hasError) {
-      return Scaffold(
-        body: Center(child: Text(loc.taskError)),
-      );
+      /// Показывает ошибку загрузки
+      return Scaffold(body: Center(child: Text(loc.taskError)));
     }
     final task = vm.currentTask;
     if (task == null) {
+      /// Если задачи нет, показывает заголовок и ошибку
       return Scaffold(
         appBar: AppBar(title: Text(_getTitle(context))),
         body: Center(child: Text(loc.taskError)),
@@ -107,6 +108,7 @@ class _TaskViewState extends State<TaskView> {
     }
 
     final hintButton = TaskActionButton(
+      /// Кнопка подсказки
       icon: SvgPicture.asset(
         'lib/assets/icons/hint.svg',
         width: 26,
@@ -132,7 +134,6 @@ class _TaskViewState extends State<TaskView> {
       textColor: colors.hint,
     );
 
-    // Кнопка проверки / продолжить
     final done = vm.answeredCorrectly;
     final secondTitle = done ? loc.continueBtn : loc.checkButton;
     final secondIcon = SvgPicture.asset(
@@ -146,6 +147,7 @@ class _TaskViewState extends State<TaskView> {
     final secondAction = done ? _onContinue : _onCheck;
 
     final actionButton = TaskActionButton(
+      /// Кнопка проверки или продолжения
       icon: secondIcon,
       title: secondTitle,
       onTap: secondAction,
@@ -171,6 +173,7 @@ class _TaskViewState extends State<TaskView> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        /// Заголовок экрана со схемой задачи
                         Container(
                           height: 100,
                           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -182,6 +185,7 @@ class _TaskViewState extends State<TaskView> {
                                 shape: const CircleBorder(),
                                 color: colors.greetingText,
                                 child: IconButton(
+                                  /// Кнопка назад
                                   icon: SvgPicture.asset(
                                     'lib/assets/icons/arrow_left.svg',
                                     width: 26,
@@ -194,6 +198,7 @@ class _TaskViewState extends State<TaskView> {
                               ),
                               const SizedBox(width: 16),
                               Expanded(
+                                /// Название экрана
                                 child: Text(
                                   _getTitle(context),
                                   style: theme.textTheme.headlineMedium,
@@ -206,6 +211,7 @@ class _TaskViewState extends State<TaskView> {
                         ),
                         const SizedBox(height: 16),
                         Padding(
+                          /// Описание типа задачи
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Text(
                             '${loc.task}: ${_getTaskSubtitle(loc, task)}',
@@ -214,6 +220,7 @@ class _TaskViewState extends State<TaskView> {
                         ),
                         const SizedBox(height: 16),
                         SingleChildScrollView(
+                          /// Отображает входные матрицы
                           scrollDirection: Axis.horizontal,
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Row(
@@ -230,6 +237,7 @@ class _TaskViewState extends State<TaskView> {
                         const SizedBox(height: 24),
                       ],
                     ),
+                    /// Поле для ввода ответов
                     MatrixInput(
                       key: _matrixKey,
                       rows: task.answer.length,
@@ -239,6 +247,7 @@ class _TaskViewState extends State<TaskView> {
                       cellCorrectness: correctness,
                     ),
                     Padding(
+                      /// Панель кнопок
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(
                         children: [
@@ -259,6 +268,7 @@ class _TaskViewState extends State<TaskView> {
     );
   }
 
+  /// Возвращает заголовок по типу задачи
   String _getTitle(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     switch (widget.taskType) {
@@ -275,6 +285,7 @@ class _TaskViewState extends State<TaskView> {
 }
 
 extension on TaskType {
+  /// Категория в Firestore по типу задачи
   String get firestoreCategory {
     switch (this) {
       case TaskType.basic:

@@ -1,3 +1,5 @@
+// lib/views/levels_list_view.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -24,7 +26,7 @@ class _LevelsListViewState extends State<LevelsListView> {
   @override
   void initState() {
     super.initState();
-    // Кэшируем future, чтобы не дергать его при каждом rebuild
+    /// Кэширует Future с количеством уровней
     _levelsCountFuture = context
         .read<FirestoreService>()
         .fetchLevelsCount(widget.taskType.firestoreCategory);
@@ -39,26 +41,25 @@ class _LevelsListViewState extends State<LevelsListView> {
     return FutureBuilder<int>(
       future: _levelsCountFuture,
       builder: (context, snapshot) {
-        // 1) Пока ждём — индикатор
         if (snapshot.connectionState != ConnectionState.done) {
+          /// Показывает индикатор загрузки
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }
-        // 2) Если ошибка — сообщение
         if (snapshot.hasError) {
+          /// Показывает сообщение об ошибке
           return Scaffold(
             body: Center(child: Text('${loc.loadError} ${snapshot.error}')),
           );
         }
-        // 3) Успех — получили число уровней
         final levelsCount = snapshot.data ?? 0;
 
         return Scaffold(
           body: SafeArea(
             child: Column(
               children: [
-                // AppBar
+                /// AppBar с кнопкой назад и заголовком
                 Container(
                   height: 100,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -94,7 +95,7 @@ class _LevelsListViewState extends State<LevelsListView> {
                   ),
                 ),
 
-                // Список уровней
+                /// Список карточек уровней
                 Expanded(
                   child: ListView.builder(
                     itemCount: levelsCount,
@@ -135,6 +136,7 @@ class _LevelsListViewState extends State<LevelsListView> {
     );
   }
 
+  /// Возвращает заголовок экрана в зависимости от типа задачи
   String _getTitle(AppLocalizations loc) {
     switch (widget.taskType) {
       case TaskType.basic:
@@ -149,8 +151,8 @@ class _LevelsListViewState extends State<LevelsListView> {
   }
 }
 
-// Чтобы не дублировать логику маппинга
 extension on TaskType {
+  /// Категория в Firestore для данного типа задачи
   String get firestoreCategory {
     switch (this) {
       case TaskType.medium:

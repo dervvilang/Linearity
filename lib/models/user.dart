@@ -9,6 +9,7 @@ class AppUser {
   final int score;
   final int rank;
 
+  /// Инициализирует нового пользователя с обязательными полями и значениями по умолчанию
   AppUser({
     required this.id,
     required this.email,
@@ -19,7 +20,7 @@ class AppUser {
     this.rank = 0,
   });
 
-  /// Создаёт AppUser из карты (например, из документа Firestore).
+  /// Создаёт AppUser из карты (например, из документа Firestore)
   factory AppUser.fromMap(Map<String, dynamic> map) {
     return AppUser(
       id: map['id'] as String,
@@ -33,7 +34,7 @@ class AppUser {
     );
   }
 
-  /// Преобразует AppUser в карту для записи в Firestore.
+  /// Преобразует AppUser в карту для записи в Firestore
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -46,12 +47,12 @@ class AppUser {
     };
   }
 
-  /// Создаёт AppUser из JSON-данных (алиас для fromMap).
+  /// Алиас для fromMap: создаёт AppUser из JSON-данных
   factory AppUser.fromJson(Map<String, dynamic> json) {
     return AppUser.fromMap(json);
   }
 
-  /// Возвращает копию AppUser с обновлёнными полями.
+  /// Возвращает копию AppUser с обновлёнными полями
   AppUser copyWith({
     String? username,
     String? avatarAsset,

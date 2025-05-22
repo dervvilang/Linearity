@@ -1,17 +1,24 @@
+// lib/widgets/user_in_rank.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:linearity/themes/additional_colors.dart';
 import 'package:linearity/views/public_profile_view.dart';
 
-/// Виджет одной строки в рейтинге. При тапе переходит на публичный профиль пользователя.
+/// Виджет строки рейтинга
 class UserInRank extends StatelessWidget {
-  /// Идентификатор пользователя для перехода на его страницу.
+  /// ID пользователя для перехода
   final String uid;
+  /// Имя пользователя
   final String username;
+  /// Путь к SVG-аватару
   final String avatarAsset;
+  /// Количество очков
   final int score;
+  /// Место в рейтинге
   final int rank;
+  /// Стилизация для топ-3
   final bool isOnBlueBackground;
 
   const UserInRank({
@@ -26,15 +33,18 @@ class UserInRank extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    /// Две цифры для ранга (например, 01, 02)
     final rankString = rank < 10 ? '0$rank' : '$rank';
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colors = theme.extension<AdditionalColors>()!;
 
+    /// Цвет текста ранга
     final rankTextColor =
         isOnBlueBackground ? colors.text : colors.greetingText;
 
     return InkWell(
+      /// Открывает публичный профиль
       onTap: () {
         Navigator.push(
           context,
@@ -46,8 +56,8 @@ class UserInRank extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            /// Отображает номер места
             Text(
               rankString,
               style: theme.textTheme.headlineMedium?.copyWith(
@@ -55,6 +65,7 @@ class UserInRank extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
+            /// Карточка с аватаром и именем
             Expanded(
               child: Card(
                 elevation: 4,
@@ -69,29 +80,31 @@ class UserInRank extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
+                      /// Аватарка пользователя
                       CircleAvatar(
                         radius: 24,
                         backgroundColor: Colors.transparent,
-                        child: ClipOval(
-                          child: SvgPicture.asset(
-                            avatarAsset,
-                            width: 48,
-                            height: 48,
-                            fit: BoxFit.cover,
-                          ),
+                        child: SvgPicture.asset(
+                          avatarAsset,
+                          width: 48,
+                          height: 48,
+                          fit: BoxFit.cover,
                         ),
                       ),
                       const SizedBox(width: 16),
+                      /// Имя и очки
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            /// Имя пользователя
                             Text(
                               username,
                               style: theme.textTheme.headlineSmall,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
+                            /// Количество очков
                             Text(
                               '$score ${loc.pointsLabel(score)}',
                               style: theme.textTheme.bodySmall,

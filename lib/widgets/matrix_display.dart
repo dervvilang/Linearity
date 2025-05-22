@@ -1,7 +1,8 @@
+// lib/widgets/matrix_display.dart
+
 import 'package:flutter/material.dart';
 
-/// Виджет для отображения матрицы с круглыми скобками
-/// и фиксированной шириной колонок под значения от -99.9 до +99.9.
+/// Отображает матрицу с круглым скобками
 class MatrixDisplay extends StatelessWidget {
   final List<List<num>> matrix;
 
@@ -9,22 +10,21 @@ class MatrixDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme     = Theme.of(context);
-    // Табличные цифры, чтобы все цифры были одной ширины
+    final theme = Theme.of(context);
+    /// Моноширинный текст для выравнивания цифр
     final textStyle = theme.textTheme.bodyMedium?.copyWith(
           fontSize: 18,
           fontFeatures: [const FontFeature.tabularFigures()],
         ) ??
         const TextStyle(fontSize: 18);
 
-    // Ширина одной ячейки, достаточная для "-99.9"
+    /// Ширина ячейки для значений от -99.9 до +99.9
     const columnWidth = 56.0;
 
-    // Формируем строки таблицы
+    /// Преобразует каждое число в строку с нужным форматом
     final rows = matrix.map<TableRow>((row) {
       return TableRow(
         children: row.map<Widget>((value) {
-          // Если число целое — без десятых, иначе с одним знаком
           final str = (value % 1 == 0)
               ? value.toInt().toString()
               : value.toStringAsFixed(1);
@@ -55,18 +55,15 @@ class MatrixDisplay extends StatelessWidget {
     );
   }
 
-  /// Скобка, растягивающаяся по высоте за счет FittedBox
+  /// Рисует скобку заданной высоты
   Widget _bracket(String ch, TextStyle base) {
     return Container(
-      // немножко горизонтальных отступов
       padding: const EdgeInsets.symmetric(horizontal: 4),
-      // растягиваем по вертикали (за счёт IntrinsicHeight в родителе)
       alignment: Alignment.center,
       child: FittedBox(
         fit: BoxFit.contain,
         child: Text(
           ch,
-          // задаём большой базовый размер — FittedBox подстроит его под высоту
           style: base.copyWith(
             fontSize: base.fontSize! * 2.5,
             fontWeight: FontWeight.w200,
